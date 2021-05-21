@@ -1,0 +1,16 @@
+﻿@model ICollection<ProductFeature>
+
+
+
+<table>
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+        <td>@Html.DisplayFor(modelItem => item.Value)</td>         
+        <td>
+            <input type="button" title="Save" value="save" onclick="location.href='@Url.Action("Updateinc", "Incident", new { id = item.FeatureId, name = item.Name, note = item.Value})'" />
+        </td>
+    </tr>
+    }
+</table>

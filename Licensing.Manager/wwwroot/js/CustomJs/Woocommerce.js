@@ -367,7 +367,7 @@ function appendDiv() {
     $(".Variations .field").show();
     //$(".Variations .field").find(".downloadableVariationsDiv").attr("id", "variations-" + count); 
     $(".Variations .field").find("#downloadableChk").attr("class", "downloadable-" + count);
-    $(".Variations .field").find("#container").attr("class", "downloadable-" + count);
+    $(".Variations .field").find("#container").attr("class", "p-3 downloadable-" + count);
     $(".Variations .field").find("#downloableShow").attr("id", "downloadable-" + count);
     $(".Variations .field").find(".txtLicense").html($("#ddlVariationsDuration option:selected").text());
     $(".Variations .field").find(".hdnAttribiteId").val($("#ddlVariationsDuration").val());

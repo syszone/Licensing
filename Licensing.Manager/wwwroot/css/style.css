@@ -484,5 +484,11 @@ ul.ui-autocomplete {
     opacity: .8;
 }
 .nav-link p{
-    padding-left:15px;
+    padding-left:5px;
+}
+[class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-treeview {
+    margin-left: 20px
+}
+[class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link {
+    width: calc(230px - .5rem * 2);
 }

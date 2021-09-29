@@ -1,0 +1,12 @@
+<License>
+  <Id>33c9fcae-e275-463f-8d73-e02235ffd172</Id>
+  <Type>Trial</Type>
+  <Quantity>2</Quantity>
+  <ProductFeatures />
+  <Customer>
+    <Name>Karan Rajgor</Name>
+    <Email>karanrajgor.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Mon, 04 Oct 2021 05:32:34 GMT</Expiration>
+  <Signature>MEYCIQCgk2ejeBSTOm9tbfLlLdHI2OBY0XWyoEeUIM3TYlHXKwIhAPxRtTAkRWy9NLe4Eg5tQ2Kd7EP19aBbrJtRNTdtuzDo</Signature>
+</License>

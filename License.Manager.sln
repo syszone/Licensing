@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Licensing", "Licensing\Lice
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LicensingTests", "LicensingTests\LicensingTests.csproj", "{A6A7347C-192D-41A0-A6A9-BF9F8E64FC4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Licensing.Manager", "Licensing.Manager\Licensing.Manager.csproj", "{4C8D8294-FEFD-404D-B5B5-C0379C23A76D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Licensing.Manager", "Licensing.Manager\Licensing.Manager.csproj", "{4C8D8294-FEFD-404D-B5B5-C0379C23A76D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,5 +33,20 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4F298BB6-5074-4729-A499-A3D3FB843E0B}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://dev.azure.com/nvisioninfotech
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Licensing.Manager\\Licensing.Manager.csproj
+		SccProjectName1 = Licensing.Manager
+		SccLocalPath1 = Licensing.Manager
+		SccProjectUniqueName2 = Licensing\\Licensing.csproj
+		SccProjectName2 = Licensing
+		SccLocalPath2 = Licensing
+		SccProjectUniqueName3 = LicensingTests\\LicensingTests.csproj
+		SccProjectName3 = LicensingTests
+		SccLocalPath3 = LicensingTests
 	EndGlobalSection
 EndGlobal

@@ -1,8 +1,39 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Products";
 }
+<link href="~/css/Plugin/datatables-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+<link href="~/css/Plugin/datatables-responsive/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+<link href="~/css/Plugin/datatables-buttons/css/buttons.bootstrap4.min.css" rel="stylesheet" />
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="card-body">
+    <table id="tblProducts" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ProductId</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Short Description</th>
+                <th>Regular Price</th>
+                <th>Sale Price</th>
+                <th>License Type</th>
+                <th>Durations</th>
+
+                @*<th>WCProductId</th>*@
+                <th>Action</th>
+            </tr>
+        </thead>
+
+    </table>
+
 </div>
+
+<script src="~/css/Plugin/datatables/jquery.dataTables.min.js"></script>
+<link href="~/css/Plugin/datatables-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+<script src="~/css/Plugin/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="~/css/Plugin/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="~/css/Plugin/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="~/css/Plugin/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="~/css/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="~/css/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="~/css/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<script src="~/js/CustomJs/Home.js"></script>

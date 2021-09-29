@@ -1,4 +1,10 @@
-﻿using Licensing.Manager.Models;
+﻿using Licensing.Manager.Handlers.QueryHandlers.Products;
+using Licensing.Manager.Models;
+using Licensing.Manager.ViewModels;
+using Licensing.Manager.ViewModels.WoocommerceModels;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,29 +15,44 @@ using System.Threading.Tasks;
 
 namespace Licensing.Manager.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IMediator _mediator;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(SignInManager<ApplicationUser> signInManager, IMediator mediator)
         {
-            _logger = logger;
+            _signInManager = signInManager;
+            _mediator = mediator;
+
         }
 
         public IActionResult Index()
         {
             return View();
         }
+        [HttpGet]
+        public async Task<JsonResult> GetProductFromDatabase()
+        {
+            List<ProductsVM> ProductData = await _mediator.Send(new ListProductFromDatabaseQuery());
+            return Json(ProductData);
+        }
+
+
 
         public IActionResult Privacy()
         {
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+       
+        public async Task<ActionResult> Logout()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
+
+
     }
 }

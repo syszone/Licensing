@@ -1,9 +1,16 @@
+using AutoMapper;
 using Licensing.Manager.Data;
+using Licensing.Manager.Helper;
+using Licensing.Manager.Interface;
+using Licensing.Manager.Models;
+using Licensing.Manager.Service;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +39,27 @@ namespace Licensing.Manager
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddIdentityCore<ApplicationUser>()
+           .AddRoles<IdentityRole>()           
+           .AddEntityFrameworkStores<ApplicationDbContext>()
+           .AddDefaultTokenProviders()
+           .AddDefaultUI();
+
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new Mapping());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            services.AddMediatR(this.GetType().Assembly);
+            var emailSettingsSection = Configuration.GetSection("EmailSettings");
+            
+            services.Configure<EmailSettings>(emailSettingsSection);
+            services.AddTransient<IEmailSend, EmailServiceAttachment>();
+            services.AddTransient<IEmailSender, EmailService>();
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -62,7 +90,7 @@ namespace Licensing.Manager
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapRazorPages();
             });
         }

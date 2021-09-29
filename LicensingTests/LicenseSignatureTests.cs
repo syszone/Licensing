@@ -92,7 +92,7 @@ namespace LicensingTests
             Assert.AreEqual(license.Type, LicenseType.Standard);
             Assert.AreEqual(license.Quantity, 10);
             Assert.IsNotNull(license.ProductFeatures);
-            Assert.AreEqual(license.ProductFeatures.GetAll(), productFeatures);
+            Assert.AreEqual(license.ProductFeatures.GetAll(), productFeatures); //Error
             Assert.IsNotNull(license.Customer);
             Assert.AreEqual(license.Customer.Name, customerName);
             Assert.AreEqual(license.Customer.Email, customerEmail);
@@ -147,7 +147,7 @@ namespace LicensingTests
             Assert.AreEqual(hackedLicense.Type, LicenseType.Standard);
             Assert.AreEqual(hackedLicense.Quantity,11); // now with 10+1 licenses
             Assert.IsNotNull(hackedLicense.ProductFeatures);
-            Assert.AreEqual(hackedLicense.ProductFeatures.GetAll(), productFeatures);
+            Assert.AreEqual(hackedLicense.ProductFeatures.GetAll(), productFeatures); //Error
             Assert.IsNotNull(hackedLicense.Customer);
             Assert.AreEqual(hackedLicense.Customer.Name,customerName);
             Assert.AreEqual(hackedLicense.Customer.Email,customerEmail);

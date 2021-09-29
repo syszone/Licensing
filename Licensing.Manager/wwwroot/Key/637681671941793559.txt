@@ -1,0 +1,12 @@
+<License>
+  <Id>0f4d2b91-92ea-4f13-b193-a81ae53fec48</Id>
+  <Type>Subscription</Type>
+  <Quantity>1</Quantity>
+  <ProductFeatures />
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Thu, 24 Mar 2022 06:16:31 GMT</Expiration>
+  <Signature>MEQCIGwxH0ykkOXh5/8Un4hryblB4z6c5gnfgaXsvb1AGIYHAiBUu/mcQxBy52Oh5ctSTxQejCyKprym2Zg23DNy9KuY9w==</Signature>
+</License>

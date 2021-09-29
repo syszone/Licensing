@@ -1,0 +1,17 @@
+<License>
+  <Id>c81b33a2-d6a4-4e97-87e9-5a1e90925810</Id>
+  <Type>Trial</Type>
+  <Quantity>2</Quantity>
+  <ProductFeatures>
+    <Feature name="Sell">True</Feature>
+    <Feature name="Some Product">val1</Feature>
+    <Feature name="Some Product 2">val3</Feature>
+    <Feature name="abc">xyz</Feature>
+  </ProductFeatures>
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Mon, 25 Oct 2021 03:59:47 GMT</Expiration>
+  <Signature>MEUCIQCvZWGi7yrpQGal053bzlInOHMTN7iBK0OhCF1CE5xA8QIgFr/dH9tWriAH2mOUKvrlHPUvV1g0TH+A5x/epHXTBvo=</Signature>
+</License>

@@ -1,0 +1,52 @@
+﻿@model List<ProductFeatureViewModel>
+@{
+    ViewData["Title"] = "Product Feature";
+}
+
+<div class="">
+    <div class="form-group">
+        <div class="col-6">
+            <label>Name</label>
+            <input type="text" class="form-control" id="txtName" />
+            <input type="hidden" id="hdnFeatureId" value="0" />
+        </div>
+        <div class="col-6">
+            <label>Value</label>
+            <input type="text" class="form-control" id="txtValue" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <button type="button" id="btnSaveFeature" class="btn btn-info ml-1">Save Feature</button>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Action</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Value)
+            </td>
+            <td>
+
+                <button type="button" class="btn btn-sm btn-success" onclick="EditRole('@item.Id', '@item.Name','@item.Value')">Edit</button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="DeleteRole('@item.Id')">Delete</button>
+
+            </td>
+        </tr>
+    }
+
+</table>
+
+<script src="~/js/CustomJs/productfeature.js"></script>

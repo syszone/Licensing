@@ -1,0 +1,12 @@
+<License>
+  <Id>4e30389d-e6c7-4eea-b4f2-c70784434ff4</Id>
+  <Type>Trial</Type>
+  <Quantity>10</Quantity>
+  <ProductFeatures />
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Mon, 04 Oct 2021 05:28:13 GMT</Expiration>
+  <Signature>MEYCIQD9EQh7nHuEBdmXIZhUM5hv1DadsAc8EeWQiFY6af2aNwIhANvdiPG9zD+qnvMxyJg8tU9VyyeeRIQdBf0gZx043x25</Signature>
+</License>

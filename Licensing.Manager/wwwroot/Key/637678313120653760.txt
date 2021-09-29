@@ -1,0 +1,16 @@
+<License>
+  <Id>626baa67-6bf3-48ff-bfb9-6bd85fcd89d6</Id>
+  <Type>Subscription</Type>
+  <Quantity>10</Quantity>
+  <ProductFeatures>
+    <Feature name="Sales Module">yes</Feature>
+    <Feature name="Purchase Module">yes</Feature>
+    <Feature name="Maximum Transactions">10000</Feature>
+  </ProductFeatures>
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Wed, 21 Sep 2022 08:58:31 GMT</Expiration>
+  <Signature>MEQCIHObiRA+x0PenGcGtnrg6WwdGAhDKd6755YrHS0gI413AiBkC4q6P0prnrN3jguJTSQMHN94w1FsBHXM02ij+YctAA==</Signature>
+</License>

@@ -1,0 +1,16 @@
+<License>
+  <Id>f798a73c-40e5-4f09-abb9-c921549c508f</Id>
+  <Type>Subscription</Type>
+  <Quantity>1</Quantity>
+  <ProductFeatures>
+    <Feature name="Feature 1">True</Feature>
+    <Feature name="Feature 2">True</Feature>
+    <Feature name="Feature 4">True</Feature>
+  </ProductFeatures>
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Expiration>Fri, 24 Dec 2021 06:52:12 GMT</Expiration>
+  <Signature>MEUCIQCgxml5xUcJOrAxAsHFwSVDdoK4BzjZh9lAvBecorE+1QIgDnyytZU+a4HJrDeihLCyBGuOdAhUHgB/FAvgSa65zGM=</Signature>
+</License>

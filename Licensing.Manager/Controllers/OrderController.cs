@@ -51,7 +51,11 @@ namespace Licensing.Manager.Controllers
                             LicenseDuration.Add(itemMeta);
                         }
                     }
-                    List<LicenseTypeDurationViewModel> duration = await _mediator.Send(new GetLicenseTypeDurationQuery(LicenseDuration[0].display_key, LicenseDuration[0].display_value));
+                    List<LicenseTypeDurationViewModel> duration = new List<LicenseTypeDurationViewModel>();
+                    if (LicenseDuration.Count > 0)
+                    {
+                        duration = await _mediator.Send(new GetLicenseTypeDurationQuery(LicenseDuration[0].display_key, LicenseDuration[0].display_value));
+                    }
 
                     CustomerViewModel _customer = new CustomerViewModel
                     {
@@ -60,13 +64,13 @@ namespace Licensing.Manager.Controllers
                         Name = request.billing.first_name + " " + request.billing.last_name,
                         Company = request.billing.company,
                         Email = request.billing.email,
-                        LicenseDurationId = duration[0].Id
+                        LicenseDurationId = duration.Count > 0 ? duration[0].Id : 0
                     };
                     var data = await _mediator.Send(new InsertCustomerQuery(_customer));
                     if (data != null && !string.IsNullOrEmpty(_customer.Email))
                     {
                         var result = data.FirstOrDefault();
-                        
+
                         List<ProductFeatureViewModel> ProdcutFeaturesList = await _mediator.Send(new ListProductFeatureQuery(_customer.WCProductId));
 
                         var licenseResponse = generateLicence(_customer.Name, _customer.Email, result.LicenseType, ProdcutFeaturesList, request.line_items[0].quantity);
@@ -91,7 +95,7 @@ namespace Licensing.Manager.Controllers
                             outputFile.WriteLine(license.ToString());
                             outputFile.Close();
                         }
-                        
+
                         var model = new LicenseViewModel
                         {
                             LicenseId = license.Id.ToString(),

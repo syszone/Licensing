@@ -134,10 +134,10 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                                 LicenseId = req.license.Id
                             }, commandType: CommandType.StoredProcedure);
                             
-                            rowCount = result.Select(x => x.count).FirstOrDefault();
+                            rowCount = res.Select(x => x.count).FirstOrDefault();
                             if (rowCount < req.license.Quantity)
                             {
-                                response.ExpiryDate = await UpdateExpiryDate(req.license.Id.ToString(), DurationEnum);
+                                response.ExpiryDate = null;
                                 var data = await connection.QueryAsync("InsertMachineKey", new
                                 {
                                     LicenseId = req.license.Id,

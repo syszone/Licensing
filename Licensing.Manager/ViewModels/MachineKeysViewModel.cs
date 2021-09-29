@@ -16,7 +16,7 @@ namespace Licensing.Manager.ViewModels
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public DateTime? ExpiryDate { get; set; }
         public List<string> Features { get; set; }
     }
 

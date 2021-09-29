@@ -66,6 +66,11 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                         response.Durations = result.Select(x => x.DurationId).FirstOrDefault();
 
                         var LicenseId = result.Select(x => x.LicenseId).FirstOrDefault();
+
+                        IEnumerable<dynamic> VarientImages = await connection.QueryAsync("GetProductDownloads",
+                                   new { ProductId = res.ProductId },
+                                   commandType: CommandType.StoredProcedure);
+
                         if (LicenseId != (int)LicenseType.Standard)
                         {
                             var WCAttributeId = result.Select(x => x.WCAttributeId).FirstOrDefault();
@@ -96,11 +101,6 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                             };
                             Products.default_attributes = new List<Default_Variation_Attributes>();
                             Products.default_attributes.Add(default_attributes);
-
-
-                            IEnumerable<dynamic> VarientImages = await connection.QueryAsync("GetProductDownloads",
-                                       new { ProductId = res.ProductId },
-                                       commandType: CommandType.StoredProcedure);
 
                             IEnumerable<GetProductVarientResult> varients = await connection.QueryAsync<GetProductVarientResult>("GetProductVarient",
                                 new { ProductId = res.ProductId },
@@ -154,6 +154,18 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                         else
                         {
                             Products.type = "simple";
+                            if (VarientImages != null && VarientImages.Count() > 0)
+                            {
+                                var Imagelist = VarientImages.Select(x => new Download
+                                {
+                                    name = x.FileName,
+                                    file = x.FileUrl
+                                }).ToList();
+                                Products.downloads = new List<Download>();
+                                Products.downloads = Imagelist;
+                                Products.downloadable = true;
+                            }
+                           
                         }
 
                         IEnumerable<GetProductCategoryResult> categories = await connection.QueryAsync<GetProductCategoryResult>("GetCategories",

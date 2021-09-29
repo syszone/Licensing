@@ -253,7 +253,7 @@ namespace Licensing.Manager.Controllers
 
         private async Task<int> SaveProductConfiguration(int ProductId, LicenseDuration durationObj, ProductViewModel productObj, List<ProductVarientViewModel> variantObj, Features featuresObj)
         {
-            var durationId = String.Join(",", durationObj.durationid);
+            var durationId = durationObj.durationid == null ? "0" :  String.Join(",", durationObj.durationid);
             var featureId = String.Join(",", featuresObj.FeaturesId);
             var UserId = User.GetUserId();
             var model = new ProductConfigurationViewModel
@@ -291,41 +291,7 @@ namespace Licensing.Manager.Controllers
         {
             return View();
         }
-        [HttpGet]
-        public async Task<JsonResult> GetCategories(ProductCategoriesViewModel model)
-        {
-            try
-            {
-                List<ProductCategoriesViewModel> Categories = await _mediator.Send(new ListCategoriesQuery());
-
-                return Json(Categories);
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return null;
-        }
-        [HttpPost]
-        public async Task<JsonResult> ProductFromCategory(int categoryId)
-        {
-            try
-            {
-                var model = new ProductFromCategoryViewModel
-                {
-                    CategoryId = categoryId
-                };
-                List<ProductFromCategoryViewModel> Categories = await _mediator.Send(new ListProductFromCategoriesQuery(categoryId));
-
-                return Json(Categories);
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return null;
-        }
-
+       
         public async Task<IActionResult> DownloadLicense()
         {
             var listOfLicense = await _mediator.Send(new ListProductLicenseQuery());

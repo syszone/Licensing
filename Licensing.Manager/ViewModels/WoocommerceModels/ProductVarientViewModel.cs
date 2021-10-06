@@ -48,6 +48,14 @@ namespace Licensing.Manager.ViewModels.WoocommerceModels
 
     }
 
+    public class GetProductTabResult
+    {
+        public int ProductId { get; set; }
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public string Contents { get; set; }
+    }
+
     public class GetProductVarientImageResult
     {
         public int Id { get; set; }

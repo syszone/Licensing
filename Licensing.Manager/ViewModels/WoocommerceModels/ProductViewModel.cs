@@ -31,7 +31,7 @@ namespace Licensing.Manager.ViewModels.WoocommerceModels
         public bool on_sale { get; set; } = false;
         public bool purchasable { get; set; } = true;
         public int total_sales { get; set; } = 0;
-        public bool downloadable { get; set; } 
+        public bool downloadable { get; set; }
         public List<Download> downloads { get; set; }
         public int download_limit { get; set; } = -1;
         public int download_expiry { get; set; } = -1;
@@ -66,9 +66,10 @@ namespace Licensing.Manager.ViewModels.WoocommerceModels
         public List<string> variations { get; set; }
         public List<Variation_Attributes> attributes { get; set; }
         public List<Default_Variation_Attributes> default_attributes { get; set; }
+        public List<Meta_Data> meta_data { get; set; }
 
-       
-         
+
+
     }
     public class LicenseDuration
     {
@@ -123,7 +124,14 @@ namespace Licensing.Manager.ViewModels.WoocommerceModels
     public class Meta_Data
     {
         public string key { get; set; }
-        public List<string> value { get; set; }
+        public List<Meta_Data_Value> value { get; set; }
+    }
+
+    public class Meta_Data_Value
+    {
+        public string title { get; set; }
+        public string id { get; set; }
+        public string content { get; set; }
     }
 
 

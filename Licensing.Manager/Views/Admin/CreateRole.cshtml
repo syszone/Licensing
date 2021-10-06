@@ -1,0 +1,129 @@
+﻿@model List<AspNetRoleViewModel>
+
+@{
+    ViewData["Title"] = "Create Role";
+
+}
+<html>
+<body>
+    <section style="padding:25px;">
+        <form>
+            <input type="hidden" id="hdnRoleId" value="" />
+            <div class="col-12">
+                <div class="form-group col-md-4">
+                    <label>Role Name</label>
+                    <input type="text" id="txtRoleName" class="form-control">
+                </div>
+
+                <div class="form-group col-md-4">
+
+                    <input type="button" value="Submit" id="btnAddRole" class="btn btn-sm btn-primary">
+                </div>
+            </div>
+        </form>
+        <div class="card-body">
+            <table id="tblRole" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+    </section>
+
+</body>
+</html>
+
+<script>
+    $(function () {
+        BindRole();
+    });
+
+    $("#btnAddRole").click(function () {
+
+        var model = {
+            RoleId: $("#hdnRoleId").val(),
+            RoleName: $("#txtRoleName").val()
+        }
+
+        $.ajax({
+            url: "/Admin/CreateRole",
+            method: "POST",
+            data: model,
+            dataType: "json",
+            success: function (result) {
+                if (result.isSuccess) {
+                    ResetForm();
+                    toastr.success(result.message);
+                    BindRole();
+
+                }
+                else {
+                    toastr.error("Please contact administration!");
+                }
+            }
+        });
+    });
+
+    function EditRole(obj) {
+        $("#hdnRoleId").val(obj.roleId);
+        $("#txtRoleName").val(obj.name);
+    }
+
+    function ResetForm() {
+        $("#hdnRoleId").val("");
+        $("#txtRoleName").val("");
+    }
+
+    function DeleteRole(RoleId) {
+        if (confirm("Are you sure you want to delete this role?")) {
+            $.ajax({
+                url: "/Admin/DeleteRole?RoleId=" + RoleId,
+                method: "GET",
+                dataType: "json",
+                success: function (result) {
+                    if (result.isSuccess) {
+                        toastr.success(result.message);
+                        BindRole();
+                    }
+                    else {
+                        toastr.error("Please contact administration!");
+                    }
+                }
+            });
+        }
+    }
+
+    function BindRole() {
+        $("#tblRole").DataTable().destroy();
+        $.ajax({
+            url: "/Admin/RoleList",
+            method: "GET",
+            dataType: "json",
+            success: function (result) {
+
+                $("#tblRole").DataTable({
+                    "paging": true,
+
+                    data: result,
+
+                    "columns": [
+
+                        { "data": "name" },
+
+                        {
+                            "render": function (data, type, row) {
+                                return "<a href='javascript:void(0);' class='btn btn-sm btn-warning' onclick= 'return EditRole(" + JSON.stringify(row) + ");' >Edit</a>" + " " +
+                                    "<a href='javascript:void(0);' class='btn btn-sm btn-danger' onclick=DeleteRole('" + row.roleId + "'); >Delete</a>";
+                            }
+                        },
+                    ]
+                });
+            }
+        });
+    }
+</script>

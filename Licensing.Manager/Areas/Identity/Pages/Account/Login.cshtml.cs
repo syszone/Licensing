@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Licensing.Manager.Models;
+using System.Security.Claims;
+using Licensing.Manager.Controllers;
 
 namespace Licensing.Manager.Areas.Identity.Pages.Account
 {
@@ -83,8 +85,24 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                    identity.AddClaim(new Claim("UserProfile", user.Image??""));
+                    identity.AddClaim(new Claim("UserName", user.FullName));
+                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(identity));
+
+                    var listMenu = await HomeController.GetMenuItem(user.Id);
+                    var menu = listMenu.Where(x => x.ParentManuName != 0 && x.HasAccess == true).Take(1).FirstOrDefault();
+
+                    if (menu != null)
+                    {
+                        return LocalRedirect(menu.URL);
+                    }
+
                     return LocalRedirect(returnUrl);
+
                 }
                 if (result.RequiresTwoFactor)
                 {

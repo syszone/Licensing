@@ -18,6 +18,8 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
     {
         private readonly ApplicationDbContext _context;
 
+       
+
         public InsertProductConfigurationQueryHandler(ApplicationDbContext context)
         {
             _context = context;
@@ -27,6 +29,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
         {
             try
             {
+                
                 using (var connection = new SqlConnection(Utils.GetConnectionString()))
                 {
                     await connection.OpenAsync();
@@ -37,7 +40,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
 
                     var productId = result.Select(r => new ProductIdViewModel { ProductId = r.ProductId }).ToList();
                     var Id = productId[0].ProductId;
-
+                    int ProductId = Convert.ToInt32(Id);
 
                     for (int i = 0; i < req.Variants.Count; i++)
                     {
@@ -49,6 +52,20 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
                                   },
                                   commandType: CommandType.StoredProcedure);
 
+                    }
+                    for (int i = 0; i < req.meta_data.Count; i++)
+                    {
+                        foreach(var item in req.meta_data[i].value)
+                        {
+                            IEnumerable<dynamic> TabResult = await connection.QueryAsync("InsertProductTab",
+                                      new
+                                      {
+                                          ProductId = Id,
+                                          Name = item.title,
+                                          Content = item.content
+                                      },
+                                      commandType: CommandType.StoredProcedure);
+                        }
                     }
                     for (int i = 0; i < req.downloadsfile.Count; i++)
                     {
@@ -65,8 +82,10 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
                                new { ProductId = Id, CategoryId = req.categories[i].id, CategoryName = req.categories[i].name },
                                commandType: CommandType.StoredProcedure);
                     }
+                    
 
-                    return 1;
+
+                    return ProductId;
                 }
 
             }

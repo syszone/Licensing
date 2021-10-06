@@ -20,14 +20,14 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
         {
             _context = context;
         }
-        private async Task<List<ProductLicenseViewModel>> GetProductLicenseFromDatabase()
+        private async Task<List<ProductLicenseViewModel>> GetProductLicenseFromDatabase(ProductLicenseViewModel req)
         {
             try
             {
                 using (var connection = new SqlConnection(Utils.GetConnectionString()))
                 {
                     await connection.OpenAsync();
-                    IEnumerable<dynamic> result = await connection.QueryAsync("GetLicenseList",
+                    IEnumerable<dynamic> result = await connection.QueryAsync("GetProductDownloads", new { ProductId =req.Id },
                         commandType: CommandType.StoredProcedure);
 
                     var licenseList = new List<ProductLicenseViewModel>();
@@ -35,14 +35,15 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                     {
                         var list = result.Select(x => new ProductLicenseViewModel
                         {
-                            
-                            ProductId = x.WCProductId,
-                            Name=x.Name,
-                            Type = x.Type,
+                            Id=x.Id,
+                            WcProductId = x.WCProductId,
                             LicenseURL=x.LicenseURL,
                             CustomerName = x.CustomerName,
                             Email = x.Email,
-                            OrderCreatedDate=x.OrderCreated
+                            OrderCreatedDate=x.OrderCreated,
+                            WCOrderId=x.WCOrderId,
+                            FileName=x.FileName,
+                            FileUrl=x.FileUrl
 
                         }).ToList();
                         licenseList = await Task.FromResult(list);
@@ -59,7 +60,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
         }
         public async Task<IEnumerable<ProductLicenseViewModel>> Handle(ListProductLicenseQuery request, CancellationToken cancellationToken)
         {
-            return await GetProductLicenseFromDatabase();
+            return await GetProductLicenseFromDatabase(request.QueryParameters);
         }
     }
 }

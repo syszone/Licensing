@@ -28,5 +28,6 @@ namespace Licensing.Manager.ViewModels
         public bool downloadable { get; set; }
 
         public string Features { get; set; }
+        public List<Meta_Data> meta_data { get; set; }
     }
 }

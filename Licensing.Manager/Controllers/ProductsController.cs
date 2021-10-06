@@ -22,11 +22,13 @@ using MediatR;
 using Licensing.Manager.Handlers.QueryHandlers.Products;
 using Licensing.Manager.Handlers.QueryHandlers.WooCommerce;
 using Licensing.Manager.Handlers;
+using System.Net;
+using System.IO.Compression;
 
 namespace Licensing.Manager.Controllers
 {
     [Authorize]
-    [CanAccessFilter]
+    //[CanAccessFilter]
     public class ProductsController : Controller
     {
         private readonly IMediator _mediator;
@@ -42,7 +44,8 @@ namespace Licensing.Manager.Controllers
 
         }
 
-        public async Task<IActionResult> Index(int productId, int wcProductId)
+        [CanAccessFilter]
+        public async Task<IActionResult> Create(int productId=0, int wcProductId=0)
         {
             ViewBag.ProductId = productId;
             ViewBag.WcProductId = wcProductId;
@@ -86,7 +89,10 @@ namespace Licensing.Manager.Controllers
                 }
                 var response = await SaveProductConfiguration(productObj.id, durationObj, productObj, variationObj, featureObj);
 
-                return Json(new { IsSuccess = true });
+                
+               
+
+                return Json(new { IsSuccess = true,response});
             }
             catch (Exception ex)
             {
@@ -272,38 +278,55 @@ namespace Licensing.Manager.Controllers
                 Variants = variantObj,
                 Features = featureId,
                 downloadsfile = productObj.downloads,
-                downloadable = productObj.downloadable
+                downloadable = productObj.downloadable,
+                meta_data=productObj.meta_data
+
             };
 
             return await _mediator.Send(new InsertProductConfigurationQuery(model));
         }
 
-
+        [CanAccessFilter]
         public async Task<IActionResult> Download()
         {
 
+           
+            return View();
+        }
+
+        public async Task<JsonResult> DownloadList(int PrdocuctId)
+        {
+            var model = new ProductLicenseViewModel {Id= PrdocuctId };
+            var listOfLicense = await _mediator.Send(new ListProductLicenseQuery(model));
+           
+            return Json(listOfLicense);
+        }
+
+        [CanAccessFilter]
+        public IActionResult SyncWithWoocommerce()
+        {
+            return View();
+        }
+
+        [CanAccessFilter]
+        public async Task<IActionResult> DownloadLicense()
+        {
             var listOfImage = await _mediator.Send(new ListProductImageQuery());
             return View(listOfImage);
         }
 
-
-        public IActionResult Create()
+        [CanAccessFilter]
+        public IActionResult Feature()
         {
             return View();
         }
-       
-        public async Task<IActionResult> DownloadLicense()
-        {
-            var listOfLicense = await _mediator.Send(new ListProductLicenseQuery());
-            return View(listOfLicense);
-        }
 
-        public async Task<IActionResult> Feature()
+        public async Task<JsonResult> FeatureList()
         {
 
             var FeatureList = await _mediator.Send(new GetAllProductFeatureQuery());
 
-            return View(FeatureList);
+            return Json(FeatureList);
         }
 
         [HttpPost]
@@ -343,6 +366,69 @@ namespace Licensing.Manager.Controllers
             };
             var response = await _mediator.Send(new GetProductForWoocommerceQuery(model));
             return Json(response);
+        }
+
+
+        [HttpGet]
+        public async Task<string> DownloadFiles(int productId)
+        {
+            try
+            {
+                var folder = DateTime.Now.Ticks.ToString();
+                var ServerPath = _hostingEnvironment.WebRootPath + "\\Downloads\\";
+                if (!Directory.Exists(ServerPath))
+                {
+                    Directory.CreateDirectory(ServerPath);
+                }
+                ServerPath = ServerPath + "\\" + folder + "\\";
+                if (!Directory.Exists(ServerPath))
+                {
+                    Directory.CreateDirectory(ServerPath);
+                }
+                var model = new ProductLicenseViewModel { Id = productId };
+                var listOfLicense = await _mediator.Send(new ListProductLicenseQuery(model));
+
+                foreach (var item in listOfLicense)
+                {
+                    var url = item.FileUrl;
+                    Uri uriResult;
+
+                    bool result = Uri.TryCreate(url, UriKind.Absolute, out uriResult)
+                        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                    if (result)
+                    {
+                        using (var client = new WebClient())
+                        {
+                            var content = client.DownloadData(url);
+                            System.IO.File.WriteAllBytes($"{ServerPath}/{Path.GetFileName(url)}", content);
+                        }
+                    }
+                }
+                return folder;
+            }
+            catch (Exception ex)
+            {
+
+                return "";
+            }
+            
+        }
+
+        public ActionResult DownloadZip(string folder)
+        {
+            var ServerPath = _hostingEnvironment.WebRootPath + "\\Downloads\\" + folder;
+            DirectoryInfo dirInfo = new DirectoryInfo(ServerPath);
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var ziparchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    foreach (var item in dirInfo.GetFiles())
+                    {
+                        var path = item.FullName;
+                        var filename = item.Name;
+                        ziparchive.CreateEntryFromFile(path, filename);
+                    }
+                return File(memoryStream.ToArray(), "application/zip", DateTime.Now.ToShortDateString().Replace("/", "") + "-Files.zip");
+            }
         }
 
     }

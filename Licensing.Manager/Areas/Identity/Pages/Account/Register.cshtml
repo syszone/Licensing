@@ -37,11 +37,21 @@
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-envelope"></span>
-                                    </div>
                                 </div>
-                                <input asp-for="Input.Email" class="form-control borderwrap" placeholder="EmailId" style=" border-right:-1px !important" />
-
                             </div>
+                            <input asp-for="Input.Email" class="form-control borderwrap" placeholder="EmailId" style=" border-right:-1px !important" />
+
+                        </div>
+                        <div class="input-group mb-4">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <i class="fa fa-pencil"></i>
+
+                                </div>
+                            </div>
+                            <input asp-for="Input.FullName" class="form-control borderwrap" placeholder="Full Name">
+
+                        </div>
                         <div class="input-group mb-4">
                             <div class="input-group-append">
                                 <div class="input-group-text">
@@ -57,10 +67,18 @@
                                     <span class="fa fa-lock"></span>
                                 </div>
                             </div>
-                            <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Confirmpassword" />
+                            <input asp-for="Input.ConfirmPassword" class="form-control borderwrap" placeholder="Confirmpassword" />
 
                         </div>
+                        <div class="input-group mb-4">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <i class="fa fa-phone" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <input asp-for="Input.Phone" class="form-control" placeholder="Phone">
 
+                        </div>
                         <button type="submit" class="btn btn-primary">Register</button>
                     </form>
                     <a id="login" asp-page="./Login" class="text-center">I already have an account</a>

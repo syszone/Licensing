@@ -41,7 +41,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
 
                     ProductViewModel Products = new ProductViewModel();
                     List<ProductVarientViewModel> varientList = new List<ProductVarientViewModel>();
-
+                   
                     if (result != null && result.Count() > 0)
                     {
                         Products = result.Select(x => new ProductViewModel
@@ -56,7 +56,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
 
                         }).FirstOrDefault();
                         var wcProductId = result.Select(x => x.WcProductId).FirstOrDefault();
-                        if(wcProductId > 0)
+                        if (wcProductId > 0)
                         {
                             Products.id = wcProductId;
                         }
@@ -114,12 +114,12 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                                     var varient = new ProductVarientViewModel
                                     {
                                         id = item.Id,
-                                        sku = DateTime.Now.Ticks.ToString(), 
+                                        sku = DateTime.Now.Ticks.ToString(),
                                         price = item.RegularPrice.ToString(),
                                         regular_price = item.RegularPrice.ToString(),
                                         sale_price = item.SalesPrice.ToString(),
                                         on_sale = item.SalesPrice > 0 ? true : false,
-                                        description=item.Description,
+                                        description = item.Description,
                                         date_created = DateTime.Now,
                                         attributes = new List<ProductAttributes>()
                                         {
@@ -165,7 +165,33 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                                 Products.downloads = Imagelist;
                                 Products.downloadable = true;
                             }
-                           
+
+                        }
+
+                        //Get Tab Here
+                        Products.meta_data = new List<Meta_Data>();
+                        IEnumerable<GetProductTabResult> TabResult = await connection.QueryAsync<GetProductTabResult>("GetProductTab",
+                           new { ProductId = res.ProductId },
+                           commandType: CommandType.StoredProcedure);
+                        if (TabResult != null && TabResult.Count() > 0)
+                        {
+                            var tabs = new Meta_Data
+                            {
+                                key = "yikes_woo_products_tabs",
+                                value = new List<Meta_Data_Value>()
+                            };
+                            foreach (var item in TabResult)
+                            {
+                                var tab = new Meta_Data_Value
+                                {
+
+                                    title = item.Name,
+                                    id = item.Name,
+                                    content = item.Contents
+                                };
+                                tabs.value.Add(tab);
+                            }
+                            Products.meta_data.Add(tabs);
                         }
 
                         IEnumerable<GetProductCategoryResult> categories = await connection.QueryAsync<GetProductCategoryResult>("GetCategories",
@@ -189,7 +215,6 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                         return response;
 
                     }
-
                 }
             }
             catch (Exception ex)

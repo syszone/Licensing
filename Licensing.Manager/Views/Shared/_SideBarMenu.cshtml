@@ -1,0 +1,182 @@
+﻿@using Licensing.Manager.General;
+@using Licensing.Manager.Controllers;
+
+@{
+    var controller = ViewContext.RouteData.Values["Controller"].ToString();
+    var method = ViewContext.RouteData.Values["Action"].ToString();
+    var MenuList = await HomeController.GetMenuItem();
+ }
+
+
+ 
+    <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            @if (MenuList != null && MenuList.Count() > 0)
+            {
+@if (MenuList.Where(r => r.MenuName == MenuItem.Product.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+{
+<li @if ((controller == "Products" && (method == "Index" || method == "Create" || method == "Feature" || method == "SyncWithWoocommerce")) || (controller == "Home" && method == "Index")) { <text> class="nav-item menu-open" </text>  } else { <text> class="nav-item" </text> }>
+    <a href="#" @if (controller == "Products" && (method == "Index" || method == "Feature" || method == "Create")) { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="fab fa-product-hunt"></i>
+        <p>
+            Product
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        @if (MenuList.Where(r => r.MenuName == MenuItem.Products.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+        {
+<li class="nav-item">
+    <a href="/" @if (controller == "Home" && method == "Index") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="fas fa-list"></i>
+        <p>Products</p>
+
+    </a>
+</li>
+}
+
+        @if (MenuList.Where(r => r.MenuName == MenuItem.CreateProduct.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+        {
+<li class="nav-item">
+    <a href="/Products/Create" @if (controller == "Products" && method == "Create") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="fas fa-cart-plus"></i>
+        <p>Create Product</p>
+
+    </a>
+</li>
+}
+        @if (MenuList.Where(r => r.MenuName == MenuItem.Features.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+        {
+<li class="nav-item">
+    <a href="/Products/Feature" @if (controller == "Products" && method == "Feature") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="far fa-circle nav-icon"></i>
+        <p>Features</p>
+    </a>
+</li>
+}
+        @if (MenuList.Where(r => r.MenuName == MenuItem.SyncToWocommerce.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+        {
+<li class="nav-item" style="display:none;">
+    <a href="/Products/SyncWithWoocommerce" @if (controller == "Products" && method == "SyncWithWoocommerce") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="fas fa-sync-alt"></i>
+        <p>Sync To Woocommerce</p>
+    </a>
+</li>
+}
+    </ul>
+</li>}
+                @if (MenuList.Where(r => r.MenuName == MenuItem.Customer.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                {
+<li class="nav-item">
+    <a href="/Products/Download" @if (controller == "Products" && method == "Download") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+        <i class="nav-icon fas fa-users"></i>
+        <p>
+            Customer
+        </p>
+    </a>
+</li>}
+                                @if (MenuList.Where(r => r.MenuName == MenuItem.UserManagement.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                                {
+                <li @if (controller == "Admin" && (method == "Index" || method == "Profile" || method == "ChangePassword" || method == "ChangeAvtar")) { <text> class="nav-item menu-open" </text>  } else { <text> class="nav-item" </text> }>
+                    <a href="#" @if (controller == "Admin" && (method == "Index" || method == "Profile" || method == "ChangePassword" || method == "ChangeAvtar")) { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>
+                            User Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (MenuList.Where(r => r.MenuName == MenuItem.SystemUsers.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                        {
+    <li class="nav-item">
+        <a href="/Admin/Index" @if (controller == "Admin" && method == "Index") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+            <i class="fas fa-id-badge"></i>
+            <p>SystemUsers</p>
+
+        </a>
+    </li>
+}
+
+
+
+                        @if (MenuList.Where(r => r.MenuName == MenuItem.Profile.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                        {
+    <li class="nav-item">
+        <a href="/Admin/Profile" @if (controller == "Admin" && method == "Profile") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+            <i class="far fa-user-circle"></i>
+            <p>Profile</p>
+
+        </a>
+    </li>
+}
+
+
+                        @if (MenuList.Where(r => r.MenuName == MenuItem.ChangePassword.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                        {
+    <li class="nav-item">
+        <a href="/Admin/ChangePassword" @if (controller == "Admin" && method == "ChangePassword") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+            <i class="fas fa-lock"></i>
+            <p>Change Password</p>
+
+        </a>
+    </li>
+}
+                        @if (MenuList.Where(r => r.MenuName == MenuItem.ChangeAvtar.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                        {
+    <li class="nav-item">
+        <a href="/Admin/ChangeAvtar" @if (controller == "Admin" && method == "ChangeAvtar") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+            <i class="fas fa-user-circle"></i>
+            <p>Change Avtar</p>
+
+        </a>
+    </li>
+}
+
+                    </ul>
+
+                </li>}
+                                                @if (MenuList.Where(r => r.MenuName == MenuItem.RoleManagement.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                                                {
+                                <li @if (controller == "Admin" && (method == "CreateRole" || method == "AssignRole" || method == "RoleAccess")) { <text> class="nav-item menu-open" </text>  } else { <text> class="nav-item" </text> }>
+                                    <a href="#" @if (controller == "Admin" && (method == "CreateRole" || method == "RoleAccess")) { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+                                        <i class="fas fa-tasks"></i>
+                                        <p>
+                                            Role Management
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        @if (MenuList.Where(r => r.MenuName == MenuItem.CreateRole.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                                        {
+                    <li class="nav-item">
+                        <a href="/Admin/CreateRole" @if (controller == "Admin" && method == "CreateRole") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+                            <i class="fas fa-user-plus"></i>
+                            <p>Create Role</p>
+
+                        </a>
+                    </li>}
+                                        @if (MenuList.Where(r => r.MenuName == MenuItem.AssignRole.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                                        {
+                    <li class="nav-item">
+                        <a href="/Admin/AssignRole" @if (controller == "Admin" && method == "AssignRole") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+                            <i class="fas fa-hourglass"></i>
+                            <p>Assign Role</p>
+
+                        </a>
+                    </li>}
+                                        @if (MenuList.Where(r => r.MenuName == MenuItem.RoleAccess.ToString()).Select(r => r.HasAccess).FirstOrDefault() == true)
+                                        {
+                    <li class="nav-item">
+                        <a href="/Admin/RoleAccess" @if (controller == "Admin" && method == "RoleAccess") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
+                            <i class="fab fa-accessible-icon"></i>
+                            <p>Role Access</p>
+
+                        </a>
+                    </li>}
+
+                                    </ul>
+
+                                </li>}}
+        </ul>
+    </nav>
+ 

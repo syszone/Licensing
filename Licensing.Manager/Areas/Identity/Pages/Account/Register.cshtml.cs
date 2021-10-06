@@ -47,6 +47,10 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
+
+            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
@@ -61,6 +65,16 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Display(Name = "Phone")]
+            public string Phone { get; set; }
+
+            [Display(Name = "Address")]
+            public string Address1 { get; set; }
+
+            [Display(Name = "Address2")]
+            public string Address2 { get; set; }
+
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -78,7 +92,9 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
                 var user = new ApplicationUser {
                     UserName = Input.Email,
                     Email = Input.Email,
-                    IsActive = true
+                    IsActive = true,
+                    FullName = Input.FullName,
+                    Phone = Input.Phone
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

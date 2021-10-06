@@ -1,6 +1,17 @@
-﻿@{ 
-    var controller = ViewContext.RouteData.Values["Controller"].ToString();
-    var method = ViewContext.RouteData.Values["Action"].ToString();
+﻿ 
+@{ 
+     
+    var claims = ViewContext.HttpContext.User.Claims.ToList();
+    var UserProfile = claims.Where(r => r.Type == "UserProfile").FirstOrDefault().Value;
+    if(string.IsNullOrEmpty(UserProfile))
+    {
+        UserProfile = "/theme/dist/img/AdminLTELogo.png";
+    }
+    var UserName = claims.Where(r => r.Type == "UserName").FirstOrDefault().Value;
+    if(string.IsNullOrEmpty(UserName))
+    {
+        UserName = "Guest User";
+    }
 }
 
 
@@ -11,6 +22,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"] - Licensing.Manager</title>
 
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
     @*CSS Section*@
@@ -23,6 +36,10 @@
     <link href="~/css/Plugin/jstree/themes/default/style.min.css" rel="stylesheet" />
     <link href="~/theme/plugins/select2/css/select2.min.css" rel="stylesheet" />
     <link href="~/css/toastr/toastr.min.css" rel="stylesheet" />
+    @*DataTable.css*@
+    <link href="~/css/Plugin/datatables-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/css/Plugin/datatables-responsive/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/css/Plugin/datatables-buttons/css/buttons.bootstrap4.min.css" rel="stylesheet" />
 
     @*ScripSection*@
     <script src="~/theme/plugins/jquery/jquery.min.js"></script>
@@ -35,6 +52,17 @@
     <script src="~/css/Plugin/jstree/jstree.min.js"></script>
     <script src="~/theme/plugins/select2/js/select2.min.js"></script>
     <script src="~/css/toastr/toastr.min.js"></script>
+    @* DataTable.js*@
+    <script src="~/css/Plugin/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/css/Plugin/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/css/Plugin/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/css/Plugin/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/css/Plugin/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/css/Plugin/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/css/Plugin/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/css/Plugin/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/css/Plugin/datatables-buttons/js/buttons.colVis.min.js"></script>
+
 
 
 </head>
@@ -65,88 +93,13 @@
         </nav>
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="/Home/Index" class="brand-link">
-                <img src="~/theme/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">AdminLTE 3</span>
+            <a href="/" class="brand-link">
+                <img src="@UserProfile" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">@UserName</span>
             </a>
 
             <div class="sidebar">
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <li @if (controller == "Products" && (method == "Index" || method == "Feature" || method == "Create"))
-                    { <text> class="nav-item menu-open" </text> } else { <text> class="nav-item" </text> }>
-                            <a href="#"@if (controller == "Products" && (method == "Index" || method == "Feature" || method == "Create"))
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                <i class="fab fa-product-hunt"></i>
-                                <p>
-                                    Product
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="/Products/Index" @if (controller == "Products" && method == "Index")
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                        <i class="fas fa-cart-plus"></i>
-                                        <p>Create Product</p>
-
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Products/Feature" @if (controller == "Products" && method == "Feature")
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Features</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Products/Create" @if (controller == "Products" && method == "Create") { <text> class="nav-link active" </text>  } else { <text> class="nav-link" </text> }>
-                                        <i class="fas fa-sync-alt"></i>
-                                        <p>Sync To Woocommerce</p>
-                                    </a>
-                                </li>
-                                
-                            </ul>
-
-                        </li>
-                        <li @if (controller == "Products" && (method == "Download" || method == "DownloadLicense"))
-                    { <text> class="nav-item menu-open" </text> } else { <text> class="nav-item" </text> }>
-                            <a href="#"  @if (controller == "Products" && (method == "Download" || method == "DownloadLicense"))
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                <i class="nav-icon fas fa-users"></i>
-                                <p>
-                                    Customer
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="/Products/Download" @if (controller == "Products" && method == "Download")
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                        <i class="fas fa-file-download"></i>
-                                        <p>Download Files</p>
-
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Products/DownloadLicense" @if (controller == "Products" && method == "DownloadLicense")
-                    { <text> class="nav-link active" </text> } else { <text> class="nav-link" </text> }>
-                                        <i class="fas fa-download"></i>
-                                        <p>Download License</p>
-
-                                    </a>
-                                </li>
-                            </ul>
-
-                        </li>
-                        @*<li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
-                <p>Widgets</p>
-            </a>
-        </li>*@
-                    </ul>
-                </nav>
+                @Html.Partial("~/Views/Shared/_SideBarMenu.cshtml") 
             </div>
         </aside>
 
@@ -167,7 +120,61 @@
             <strong>Copyright &copy; @DateTime.Now.Year <a href="https://adminlte.io">Licensing.Manager</a>.</strong>
         </footer>
 
-    </div>
 
+
+    </div>
+    <div id="modalAddUser" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Create User</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="frmCreateUser">
+                        <input type="hidden" id="hdnRegUserId" value="" />
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="txtEmail">Email<strong class="col-error">*</strong></label>
+                                <input type="text" class="form-control" id="txtEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="txtFullName">Full Name<strong class="col-error">*</strong></label>
+                                <input type="text" class="form-control" id="txtFullName" value="" required>
+
+                            </div>
+                            <div class="form-group">
+
+                                <label for="txtPhone">Phone<strong class="col-error">*</strong></label>
+                                <input type="text" class="form-control" id="txtPhone" value="" required>
+
+                            </div>
+                            <div class="add-user">
+                                <div class="form-group">
+                                    <label for="txtPassword">Password<strong class="col-error">*</strong></label>
+                                    <input type="password" class="form-control" id="txtPassword" value="" required>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="txtConfirmPassword">Confirm Password<strong class="col-error">*</strong></label>
+                                    <input type="password" class="form-control" id="txtConfirmPassword" value="" required>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="btnCreateUser">Submit</button>
+
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 </body>
 </html>

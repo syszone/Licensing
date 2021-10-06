@@ -1,42 +1,75 @@
-﻿@model List<ProductImageViewModel>
+﻿@*@model List<ProductLicenseViewModel>*@ 
 
 @{
     ViewData["Title"] = "Downalod Files";
 }
+ 
+<div class="card-body">
+    <table id="tblDownloads" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ProductId</th>
+                <th>Customer Name</th>
+                <th>Order Id</th>
+                <th>Email</th>
+                <th>Order Created Date</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+ 
+<script src="~/js/CustomJs/productfeature.js"></script>
 
-<table class="table">
-    <tr>
-        <th>ProductId  </th>
-        <th>FileName </th>
-        <th>Customer Name</th>
-        <th>Email</th>
-        <th>Order Created Date</th>
-        <th>Download</th>
-    </tr>
+<script>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @item.WCProductId
-            </td>
-            <td>
-                @item.FileName
-            </td>
+    $(function () {
+        BindDownloads();
+    });
 
-            <td>
-                @item.CustomerName
-            </td>
-            <td>
-                @item.Email
-            </td>
-            <td>
-                @item.OrderCreatedDate
-            </td>
-            <td>
-                <a class="fa fa-download" href="@item.FileUrl" target="_blank"></a>
-            </td>
-        </tr>
+    function BindDownloads() {
+        $("#tblDownloads").DataTable().destroy();
+        $.ajax({
+            url: "/Products/DownloadList",
+            method: "GET",
+            dataType: "json",
+            success: function (result) {
+               
+                $("#tblDownloads").DataTable({
+                    "paging": true,
+                    data: result,
+                    "order": [[2, "desc"]],
+                    "columns": [
+
+                        { "data": "wcProductId" },
+                        { "data": "customerName" },
+                        { "data": "wcOrderId" },
+                        { "data": "email" },
+                        { "data": "orderCreatedDate" },
+                        {
+                            "render": function (data, type, row, full) {
+                                var id = "dropdownMenuButton" + row.wcOrderId;
+                                return "<div class='dropdown'><button class='btn btn-secondary dropdown-toggle' type='button' id='" + id + "' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Download </button><div class='dropdown-menu' aria-labelledby='" + id + "'><li><a class='dropdown-item' href='javascript:void(0)' onclick=DownloadFile('" + row.id + "');>Product Downloadable Files</a></li><li><a class='dropdown-item' target='_blank' href='" + row.licenseURL+"'>License Files</a></li></div>"
+                                
+                            }
+                        },
+                    ]
+                });
+            }
+        });
     }
 
-</table>
+    function DownloadFile(ProductId) {
+
+        $.ajax({
+            url: "/Products/DownloadFiles?productId=" + ProductId,
+            method: "GET",
+            dataType: "text",
+            success: function (result) {
+                location.href = "/Products/DownloadZip?folder=" + result;
+            }
+        });
+    }
+    
+</script>
+

@@ -42,7 +42,8 @@ namespace Licensing.Manager.Handlers.QueryHandlers.WooCommerce
                             FileUrl = x.FileUrl,
                             CustomerName = x.CustomerName,
                             Email = x.Email,
-                            OrderCreatedDate=x.OrderCreated
+                            OrderCreatedDate=x.OrderCreated,
+                            WCOrderId=x.WCOrderId
 
                         }).ToList();
                         ImageList = await Task.FromResult(list);

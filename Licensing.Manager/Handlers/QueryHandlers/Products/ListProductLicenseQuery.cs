@@ -9,5 +9,11 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
 {
     public class ListProductLicenseQuery : IRequest<IEnumerable<ProductLicenseViewModel>>
     {
+        public ProductLicenseViewModel QueryParameters { get; private set; }
+
+        public ListProductLicenseQuery(ProductLicenseViewModel queryParameter)
+        {
+            this.QueryParameters = queryParameter;
+        }
     }
 }

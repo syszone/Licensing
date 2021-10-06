@@ -1,23 +1,945 @@
-﻿
+﻿@model ProductResponse
 @{
-    ViewData["Title"] = "Sync with woocommerce";
+    ViewData["Title"] = "Create Product";
 }
 
+<style>
+    #allcat {
+        height: 390px;
+        overflow-y: scroll;
+    }
+
+    .divProductInfo .tab-content.link-wrap {
+        border: none;
+    }
+
+    .ui-autocomplete-loading {
+        background: white url('/images/loading.gif') right center no-repeat;
+        background-size: 50px;
+    }
+
+    .downloableShow {
+        position: absolute;
+        right: 10px;
+    }
+</style>
+
+<div class="loader" id="loaderDiv" style="display:none">
+    <img src="~/images/Rolling-1s-200px.svg" alt="gif" />
+</div>
 <div class="">
-    <div class="form-group">
-        <div class="col-6">
-            <label>Product</label>
-            <select class="form-control" id="ddlProduct">
-            </select>
+    <form>
+
+        <input type="hidden" id="hdnProductId" value="@ViewBag.ProductId" />
+        <input type="hidden" id="hdnWcProductId" value="@ViewBag.WcProductId" />
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" class="form-control form-control-sm" id="productName">
+                </div>
+                <div class="form-group">
+                    <label>Product Description</label>
+                    <textarea class="form-control form-control-sm" rows="5" id="txtproductDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Product Short Description</label>
+                    <textarea class="form-control form-control-sm" rows="3" id="txtproductshortDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="Select Duration">Product Features</label>
+                    <select class="form-control" id="ddlFeatures" multiple="multiple" name="ddlFeatures"></select>
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="divHeader">
+                    <label>Product Category</label>
+                </div>
+                <div class="clearfix"></div>
+                <div id="allcat" class="tab-pane active">
+                    <div id="jstreeAllCategory" class="demo" style="margin-top: 2em;"></div>
+                </div>
+            </div>
+        </div>
+
+        <label class="mr-2" style="font-weight:bold">
+            Simple Product
+        </label>
+        <div class="fs-14">
+            <div class="card">
+                <p class="tab-header">
+                    <div class="container" id="downloadableChk">
+                        <label class="custom-checkbox">
+                            Downloadable:
+                            <input type="checkbox" id="chkDownloadable" />
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </p>
+                <div class="row border-top no-gutters tab-wrap">
+                    <div class="col-4">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs flex-column text-capitalize" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="tabGeneral" data-toggle="tab" href="#general">general</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#inventory">inventory</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#linked">linked products</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#attributes">Attributes products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#variations">Variations</a>
+                            </li>
+                            @*<li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#advanced">advanced products</a>
+                            </li>*@
+                            @*<li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#getmore">getmore products</a>
+                            </li>*@
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#custom">custom products</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-8">
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div id="general" class="tab-pane active">
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label for="rPrice">Regular price ($)</label>
+                                        <input type="number" value="0" class="form-control form-control-sm" id="txtrRegularPrice">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sPrice">Sale price ($)</label>
+                                        <input type="number" value="0" class="form-control form-control-sm" id="txtsalePrice">
+                                        @*<a class="ml-2" id="hrefschedule" href="javascript:void(0)">Schedule</a>*@
+                                    </div>
+                                    <div class="form-group" id="divsalepricedate" style="display:none">
+                                        <label for="sPrice">Sale price Date</label>
+                                        <input type="text" class="form-control form-control-sm mb-3" name="datePicker" id="txtsalepricefromdate" placeholder="FROM... YYYY-MM-DD">
+
+                                        <input type="text" class="form-control form-control-sm" name="datePicker" id="txtsalepricetodate" placeholder="FROM.. YYYY-MM-DD">
+                                        <a class="ml-2" id="hrefcancel" href="javascript:void(0)">Cancel</a>
+
+                                    </div>
+
+
+                                </div>
+
+                                <div class="container p-3" style="display:none" id="divDownloadable">
+                                    <hr />
+                                    <div class="form-group">
+                                        <label class="radio">
+                                            Add Link
+                                            <input type="radio" name="imageOption" value="AddLink" checked />
+
+                                        </label>
+                                        <label class="radio">
+                                            Choose File
+                                            <input type="radio" name="imageOption" value="ChooseFile" />
+
+                                        </label>
+                                    </div>
+                                    <div class="form-group" style="display:none" id="divchoosefiles">
+                                        <label for="rPrice">Downloadable files</label>
+                                        <input type="file" id="DropdownloadableImage" multiple>
+
+                                    </div>
+
+                                    <div class="AddFiles">
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="rPrice">Download limit</label>
+                                        <input type="number" value="0" class="form-control form-control-sm" id="txtDownloadLimit" placeholder="Unlimited">
+                                        <p>Leave blank for unlimited re-downloads.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sPrice">Download expiry</label>
+                                        <input type="number" value="0" class="form-control form-control-sm" id="txtdownloadExpiry" placeholder="Never">
+                                        <p>Enter the number of days before a download link expires, or leave blank.</p>
+                                    </div>
+                                    <div class="form-group" id="divsalepricedate" style="display:none">
+                                        <label for="sPrice">Sale price Date</label>
+                                        <input type="text" class="form-control form-control-sm" name="datePicker" id="txtsalepricefromdate" placeholder="FROM... YYYY-MM-DD">
+                                        <a class="ml-2" id="hrefcancel" href="javascript:void(0)">Cancel</a>
+                                        <p class="form-group mb-0 date-wrap">
+                                            <input type="text" class="form-control form-control-sm" name="datePicker" id="txtsalepricetodate" placeholder="FROM.. YYYY-MM-DD">
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label>Tax status</label>
+                                        <select class="form-control form-control-sm" id="ddltaxStatus">
+                                            <option selected="selected" value="taxable">Texable</option>
+                                            <option value="shipping">Shipping Only</option>
+                                            <option value="none">None</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tax class</label>
+                                        <select class="form-control form-control-sm" id="ddlTaxClass">
+                                            <option>Standard</option>
+                                            <option>Reduced Rate</option>
+                                            <option>Zero Rate</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="inventory" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label for="sku">SKU</label>
+                                        <input type="text" class="form-control form-control-sm" id="txtsku" value="@DateTime.Now.Ticks">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="stock">Manage stock?</label>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="chkenablestock" />
+                                            Enable stock management at product level
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    <div class="form-group" id="divstockquantity" style="display:none">
+                                        <label for="stockquantity">Stock Quantity</label>
+                                        <input type="number" class="form-control form-control-sm mb-2" id="txtStockQuantity" value="0">
+
+                                        <label>Allow Backorders?</label>
+                                        <select class="form-control form-control-sm mb-2" id="ddlAllowbackorders">
+                                            <option>Do not Allow</option>
+                                            <option>Allow,but Notify Customer</option>
+                                            <option>Allow</option>
+                                        </select>
+
+                                        <label>Low stock threshold</label>
+                                        <input type="number" class="form-control form-control-sm mb-2" id="txtlowstockthreshold" placeholder="Store-wide thresold(2)">
+
+                                    </div>
+
+                                    <div class="form-group" id="divstockstatus">
+                                        <label>Stock status</label>
+                                        <select class="form-control form-control-sm" id="ddlstockstatus">
+                                            <option selected="selected" value="instock">In stock</option>
+                                            <option value="outofstock">Out of stock</option>
+                                            <option value="onbackorder">On backorder</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label for="stock">Sold individually</label>
+                                        <label class="custom-checkbox mr-3">
+                                            <input type="checkbox" id="chksolIndividually" />
+                                            <span class="checkmark"></span>
+                                            Enable this to only allow one of this item to be bought in a single order
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="scenarios" class="tab-pane fade">
+                                <div class="container p-3 text-center">
+                                    <p class="scenario-icon mb-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="#ddd" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
+                                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z" />
+                                        </svg>
+                                    </p>
+                                    <h3>Scenarios</h3>
+                                    <p class="text-muted">First, <a href="#" target="_blank">create some Components</a> by navigating to the Components tab. <br>Then, return here to <a href="#" target="_blank">add Scenarios</a>.</p>
+                                </div>
+                            </div>
+                            <div id="shipping" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label>Shipping class</label>
+                                        <ul class="list-unstyled layout_wrap ship mb-0">
+                                            <li>
+                                                <label class="custom_radio">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="80" height="80" viewBox="0 0 512.000000 410.000000" preserveAspectRatio="xMidYMid meet">
+
+                                                        <g transform="translate(0.000000,410.000000) scale(0.100000,-0.100000)" fill="#ddd" stroke="none">
+                                                            <path d="M63 4080 c-56 -34 -63 -61 -63 -238 0 -149 1 -161 23 -193 37 -56 51 -59 280 -59 l207 0 0 -1489 0 -1488 23 -34 c45 -68 53 -69 429 -69 l338 0 -8 -32 c-12 -57 -7 -171 11 -223 38 -112 148 -211 267 -241 283 -71 536 185 464 471 l-6 25 792 0 c481 0 789 -4 785 -9 -16 -27 -24 -118 -15 -174 20 -127 102 -234 220 -291 58 -27 75 -31 155 -31 70 1 103 6 147 24 81 31 159 106 200 189 29 59 33 76 33 152 0 47 -3 97 -8 112 l-7 28 342 0 c384 0 392 1 430 71 17 30 18 53 16 201 l-3 168 -33 32 -32 33 -2013 5 -2012 5 -5 1501 c-5 1484 -5 1502 -25 1524 -45 50 -46 50 -487 50 -392 0 -415 -1 -445 -20z" />
+                                                            <path d="M2597 4089 c-143 -34 -263 -164 -287 -315 -6 -36 -10 -488 -10 -1146 l0 -1088 770 0 770 0 0 1108 c0 1233 3 1178 -68 1282 -48 71 -121 125 -201 150 -59 19 -91 20 -500 19 -240 -1 -453 -5 -474 -10z m861 -566 l2 -193 -385 0 -385 0 0 195 0 195 383 -2 382 -3 3 -192z" />
+                                                            <path d="M1706 3315 c-59 -21 -108 -65 -138 -125 l-28 -54 0 -700 c0 -684 1 -702 21 -746 27 -60 64 -98 124 -126 46 -22 63 -24 208 -24 l157 0 0 895 0 895 -152 0 c-104 -1 -165 -5 -192 -15z" />
+                                                            <path d="M4100 2435 l0 -895 148 0 c171 0 220 12 276 66 20 19 46 54 59 77 l22 42 0 710 c0 709 0 710 -22 750 -28 53 -78 99 -133 124 -39 18 -66 21 -197 21 l-153 0 0 -895z" />
+                                                        </g>
+
+                                                        <p class="mt-2 mb-2">
+                                                            <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Unassembled – Bundled products preserve their individual dimensions, weight and shipping classes. A virtual container item keeps them grouped together in the cart.">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                                </svg>
+                                                            </span>
+                                                        </p>
+                                                    </svg>
+                                                    <input type="radio" name="radioAssemble" checked id="rbtnunassemble" value="UnAssemble">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="custom_radio">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="90" height="90" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+
+                                                        <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#ddd" stroke="none">
+                                                            <path d="M2301 4654 c-14 -18 -21 -41 -21 -70 l0 -44 -45 0 c-82 0 -149 -40 -186 -112 -17 -33 -19 -61 -19 -273 l0 -235 -85 0 -85 0 0 170 c0 147 -3 177 -21 225 -29 78 -111 164 -191 201 l-63 29 -650 0 -650 0 -57 -23 c-80 -32 -150 -99 -190 -180 -30 -61 -33 -75 -33 -157 1 -71 5 -100 23 -139 48 -106 137 -182 247 -211 49 -12 130 -15 462 -15 l403 0 0 -1228 c0 -1354 -3 -1280 63 -1378 17 -27 51 -62 74 -79 l41 -30 0 -105 c1 -170 58 -308 172 -414 108 -99 230 -146 383 -146 303 0 547 248 547 557 l0 53 203 0 c142 0 209 4 227 13 30 15 45 54 36 91 -14 56 -12 56 -756 56 -739 0 -716 -2 -773 56 -67 67 -61 -42 -67 1362 l-5 1274 -37 34 -38 34 -130 0 -130 0 0 216 0 215 303 -3 c326 -3 332 -4 395 -62 61 -55 57 41 62 -1374 l5 -1294 24 -19 c23 -19 61 -19 1530 -19 950 0 1519 -4 1540 -10 84 -24 161 -118 161 -194 0 -74 -51 -163 -114 -199 -16 -9 -242 -13 -893 -17 -856 -5 -873 -5 -892 -25 -33 -34 -36 -68 -8 -101 l25 -29 300 -3 299 -3 5 -92 c14 -240 176 -440 408 -502 71 -19 209 -19 280 0 190 51 344 205 395 395 8 30 15 90 15 133 l0 77 28 0 c44 0 148 55 197 105 26 25 59 72 73 103 22 48 27 71 27 147 0 77 -4 98 -26 146 -26 54 -95 136 -132 156 -15 7 -16 14 -7 39 7 20 10 183 8 480 l-3 449 -30 54 c-34 61 -86 110 -154 142 -39 20 -67 23 -188 27 l-143 4 0 92 c-1 136 -43 209 -138 236 -21 6 -156 10 -319 10 l-282 0 -3 218 c-3 204 -4 220 -27 264 -32 65 -95 126 -161 156 -48 23 -72 26 -192 30 l-138 5 0 221 c0 130 -5 237 -11 261 -22 80 -106 135 -206 135 l-43 0 0 50 c0 37 -5 55 -20 70 -19 19 -33 20 -299 20 l-280 0 -20 -26z m469 -189 l0 -65 -170 0 -170 0 0 65 0 65 170 0 170 0 0 -65z m-1970 -280 l0 -215 -222 0 c-244 0 -281 5 -337 44 -145 101 -99 335 73 376 17 5 133 8 259 9 l227 1 0 -215z m1480 170 c0 -42 22 -90 45 -99 9 -3 135 -6 279 -6 249 0 265 1 289 20 20 16 27 31 29 68 3 46 4 47 39 50 67 6 69 -1 69 -248 l0 -219 -179 -3 c-159 -3 -181 -5 -200 -22 -26 -23 -28 -81 -4 -108 15 -17 40 -18 372 -18 196 0 374 -5 395 -10 45 -10 81 -34 110 -74 19 -25 21 -44 24 -232 l3 -204 -43 0 c-95 0 -166 -40 -199 -115 -14 -29 -19 -64 -19 -132 l0 -93 -50 0 -50 0 0 278 c0 267 -1 280 -20 297 -31 28 -79 24 -107 -9 -23 -27 -23 -28 -23 -299 l0 -272 -52 -19 c-72 -25 -158 -112 -184 -186 -18 -52 -19 -82 -15 -487 l3 -433 -466 0 -466 0 2 993 3 992 288 5 c271 5 290 6 303 24 20 28 17 69 -5 97 -18 23 -27 24 -145 27 l-126 4 0 223 c0 249 -1 244 68 245 30 0 32 -2 32 -35z m1270 -1350 l0 -95 -55 0 -55 0 0 79 c0 93 11 111 71 111 l39 0 0 -95z m724 79 c12 -11 16 -36 16 -95 l0 -79 -295 0 -295 0 0 95 0 95 279 0 c241 0 282 -2 295 -16z m456 -351 c58 -36 80 -87 80 -182 l0 -81 -935 0 -935 0 0 88 c0 83 2 92 30 130 17 23 31 42 33 42 1 0 20 7 42 15 34 12 162 14 845 12 l805 -2 35 -22z m80 -498 l0 -85 -935 0 -935 0 0 85 0 85 935 0 935 0 0 -85z m0 -332 c0 -54 -4 -104 -8 -111 -7 -10 -200 -12 -933 -10 l-924 3 -3 108 -3 107 936 0 935 0 0 -97z m-3191 -912 c-1 -143 104 -251 246 -251 146 0 248 100 249 243 l1 68 75 -3 75 -3 -1 -78 c-1 -68 -6 -87 -38 -152 -42 -85 -107 -149 -194 -192 -51 -25 -67 -28 -162 -28 -97 0 -110 2 -172 32 -136 64 -220 190 -226 341 l-4 82 75 0 76 0 0 -59z m345 28 c21 -62 -29 -129 -96 -129 -53 0 -98 43 -98 93 0 66 3 68 98 65 83 -3 87 -4 96 -29z m2026 -26 c0 -102 66 -201 156 -239 48 -20 151 -17 199 5 51 23 121 102 135 150 5 20 10 60 10 89 l0 52 76 0 77 0 -5 -84 c-4 -69 -10 -96 -36 -148 -39 -79 -120 -159 -199 -196 -52 -24 -70 -27 -163 -27 -93 0 -112 3 -162 27 -144 67 -238 214 -238 370 l0 58 75 0 75 0 0 -57z m344 41 c38 -99 -75 -188 -157 -124 -31 24 -45 81 -28 116 10 23 15 24 95 24 67 0 85 -3 90 -16z" />
+                                                            <path d="M2075 3498 c-46 -25 -45 -1 -45 -779 0 -730 0 -737 21 -763 28 -36 80 -36 108 0 21 26 21 33 21 760 0 403 -3 740 -6 749 -6 15 -54 45 -71 45 -4 0 -17 -6 -28 -12z" />
+                                                            <path d="M2590 3503 c-8 -3 -23 -12 -32 -21 -17 -14 -18 -63 -18 -764 0 -735 0 -748 20 -768 25 -25 71 -26 101 -1 l24 19 3 740 2 740 -22 25 c-25 27 -54 38 -78 30z" />
+                                                        </g>
+
+                                                        <p class="mt-2 mb-2">
+                                                            <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Assembled – Bundled products are assembled and shipped in a new physical container with the specified dimensions, weight and shipping class. The entire bundle appears as a single physical item.
+
+                                  To ship a bundled product outside this container, navigate to the Bundled Products tab, expand its settings and enable Shipped Individually. Bundled products that are Shipped Individually preserve their own dimensions, weight and shipping classes.">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                                </svg>
+                                                            </span>
+                                                        </p>
+                                                    </svg>
+                                                    <input type="radio" name="radioAssemble" id="rbtnassemble" value="Assemble">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+                                    <div style="display:none;" id="divshippingnew">
+                                        <div class="form-group">
+                                            <label for="stock">Weight (kg)</label>
+                                            <input type="text" class="form-control form-control-sm" id="txtweight" />
+                                        </div>
+                                        <div class="form-group">
+
+                                            <label for="Assembledweight">Assembled weight</label>
+                                            <select class="form-control form-control-sm" id="ddlAssembledweight">
+                                                <option>Ignore</option>
+                                                <option>Preserve</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="stock">Dimensions (cm)</label>
+                                            <div class="dimension-box">
+                                                <input type="number" class="form-control form-control-sm" placeholder="Length" id="txtDlength" value="0" />
+                                                <input type="number" class="form-control form-control-sm" placeholder="Width" id="txtDweight" value="0" />
+                                                <input type="number" class="form-control form-control-sm" placeholder="Height" id="txtDheight" value="0" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="shipingclass">Shipping class</label>
+                                            <select class="form-control form-control-sm" id="ddlShippingclass">
+                                                <option value="0">No Shipping class</option>
+                                                <option value="1">Azer</option>
+                                                <option value="2">Mazes</option>
+                                                <option value="3">Microscopes</option>
+                                                <option value="4">RWD-AIC</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="linked" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group" id="txtupsellwrap">
+                                        <label for="upsells">Upsells</label>
+                                        <textarea class="form-control form-control-sm" rows="2" id="txtupsells" placeholder="Search for a product.."></textarea>
+                                        <input type="hidden" class="hdnupsellProductId" />
+                                    </div>
+                                    <div class="form-group" id="txtcrosssellswrap">
+                                        <label for="crosssells">Cross sells</label>
+                                        <textarea class="form-control form-control-sm" rows="2" id="txtcrosssells" placeholder="Search for a product.."></textarea>
+                                        <input type="hidden" class="hdnCrossProductId" />
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="container p-3">
+                                    <div class="form-group mb-0" id="txtbundlesellwrap">
+                                        <label for="bundlesell">Bundle-sells</label>
+                                        <textarea class="form-control form-control-sm" rows="2" id="txtbundlesell" placeholder="Search for a product.."></textarea>
+
+                                        <input type="hidden" class="hdnBundleSellProductId" />
+                                    </div>
+                                    <p class="notes text-muted"><i>Supports Simple products only.</i></p>
+                                    <div class="form-group">
+                                        <label>Bundle-sells title</label>
+                                        <textarea rows="2" class="form-control form-control-sm" id="txtBundleSellTitle" placeholder="e.g 'Frequently Bought Together'"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bundledcs">Bundle-sells Discount</label>
+                                        <input type="text" class="form-control form-control-sm" id="txtBundleSelldcs">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="bundle" class="tab-pane">
+                                <div class="container p-3" id="divbundle">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Layout</label>
+                                                <select class="form-control form-control-sm" id="ddlbundle_layout">
+                                                    <option selected="selected" value="default">Default</option>
+                                                    <option value="tabular">Tabular</option>
+                                                    <option value="Grid">Grid</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Form Location</label>
+                                                <select class="form-control form-control-sm" id="ddlbundlefromlocation">
+                                                    <option selected="selected" value="default">Default</option>
+                                                    <option value="after_summary">After Summary</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Item Grouping</label>
+                                                <select class="form-control form-control-sm" id="ddlitemgrouping">
+                                                    <option value="parent">Grouped</option>
+                                                    <option value="flat_composited">Flat</option>
+                                                    <option value="none">None</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Min Bundle Size</label>
+                                                <input class="form-control form-control-sm" type="number" id="txtminbundlesize" />
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Max Bundle Size</label>
+                                                <input class="form-control form-control-sm" type="number" id="maxbundlesize" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Bundle Short Description</label>
+                                        <textarea class="form-control form-control-sm" rows="2" id="txtbundleshortdescription"></textarea>
+                                    </div>
+                                    <div class="form-group" id="diveditcart">
+                                        <label>Edit in Cart</label>
+                                        <label class="custom-checkbox mt_15">
+                                            <input type="checkbox" id="chkbundleeditcart" />
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+
+
+                                </div>
+                                <div id="components" class="container p-3">
+                                    <div class="container p-3" id="divcompositelayout">
+                                        <div class="form-group">
+                                            <label>Layout</label>
+                                            <ul class="list-unstyled layout_wrap">
+                                                <li>
+                                                    <svg width="90px" fill="#ddd" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 200 120" style="enable-background:new 0 0 200 120;" xml:space="preserve">
+                                                    <rect x="83" y="-83" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 117 -83)" class="st0" width="34" height="200" />
+                                                    <rect x="83" y="-40" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 160 -40)" class="st0" width="34" height="200" />
+                                                    <rect x="83" y="3" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 203 3)" class="st0" width="34" height="200" />
+                                                </svg>
+                                                    <p class="mt-2 mb-2">
+                                                        <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Stacked – Components are stacked.">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                            </svg>
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li>
+                                                    <svg width="90px" fill="#ddd" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 200 120" style="enable-background:new 0 0 200 120;" xml:space="preserve">
+                                                    <rect y="0" class="st0" width="154" height="34" />
+                                                    <rect y="43" class="st0" width="154" height="34" />
+                                                    <rect y="86" class="st0" width="154" height="34" />
+                                                    <polygon class="st0" points="187,93 187,7 177,7 177,93 167,93 182,113 197,93 " />
+                                                   </svg>
+                                                    <p class="mt-2 mb-2">
+                                                        <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Progressive – Components are stacked, wrapped in toggle-boxes and configured in sequence.">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                            </svg>
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li>
+                                                    <svg width="90px" fill="#ddd" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 200 120" style="enable-background:new 0 0 200 120;" xml:space="preserve">
+                                                    <rect class="st0" width="200" height="90" />
+                                                    <rect x="150" y="100" class="st0" width="50" height="20" />
+                                                    <rect y="100" class="st0" width="50" height="20" />
+                                </svg>
+                                                    <p class="mt-2 mb-2">
+                                                        <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Stepped – Components are viewed and configured step-by-step. The configuration is summarized in a final Review step.">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                            </svg>
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li>
+                                                    <svg width="90px" fill="#ddd" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 200 120" style="enable-background:new 0 0 200 120;" xml:space="preserve">
+                                                    <rect class="st0" width="60" height="120" />
+                                                    <rect x="70" class="st0" width="60" height="120" />
+                                                    <rect x="140" class="st0" width="60" height="120" />
+                                </svg>
+                                                    <p class="mt-2 mb-2">
+                                                        <span class="ml-2" data-toggle="tooltip" data-placement="bottom" title="Componentized – A variation of the Stepped layout that starts with a configuration Summary. Components can be configured in any sequence.">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
+                                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                                                            </svg>
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Form Location</label>
+                                            <select class="form-control form-control-sm" id="ddlcompositefromlocation">
+                                                <option value="default" selected="selected">Default</option>
+                                                <option value="after_summary">Before tabs</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Catalog Price</label>
+                                            <select class="form-control form-control-sm">
+                                                <option>Use Default</option>
+                                                <option>Calculate From/To</option>
+                                                <option>Hide</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Edit in Cart</label>
+                                            <label class="custom-checkbox mt_15">
+                                                <input type="checkbox" id="chkcompositeeditcard" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container p-3">
+                                    <div class="divProductInfo"></div>
+
+                                </div>
+                                <div class="row">
+                                    <button type="button" id="btnAddproduct" class="btn btn-info">Add Product</button>
+
+                                </div>
+
+
+                            </div>
+
+                            <div id="attributes" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group mb-0">
+                                        <div class="form-group">
+                                            <label>Product License Type</label>
+                                            <select class="form-control form-control-sm" rows="2" id="drpLicenseType">
+                                            </select>
+                                        </div>
+                                        <div id="divStandard" class="form-group" style="display:none">
+                                            <label for="Select Duration">Select Duration</label>
+                                            <select class="form-control" id="ddlDuration" multiple="multiple" name="ddlDuration"></select>
+
+                                        </div>
+                                        <div id="divTrialDuration" class="form-group" style="display:none">
+                                            <label for="Select Duration">Select Duration</label>
+                                            <select class="form-control" id="ddlTrialDuration"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container p-3" style="display:none">
+                                    <button class="btn btn-sm btn-primary">Save attributes</button>
+                                </div>
+                            </div>
+
+                            <div id="variations" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label for="Select Duration">Default From Values:</label>
+                                        <select class="form-control" id="ddlVariationsDuration" name="ddlVariationsDuration"></select>
+                                        <button type="button" class="btn btn-info btn-sm mt-2" id="btnAddvariations">Add</button>
+                                    </div>
+                                    <div class="Variations">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            @*<div id="advanced" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <div class="form-group">
+                                        <label>Purchase note</label>
+                                        <textarea class="form-control form-control-sm" rows="2" id="txtpurchasenote"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Menu order</label>
+                                        <input class="form-control form-control-sm" type="number" id="txtmenuorder" value="0" />
+                                    </div>
+                                </div>
+                            </div>*@
+                            @*<div id="getmore" class="tab-pane fade">
+                                <div class="container p-3">
+                                    <p><b>Recommended extensions</b></p>
+                                </div>
+                                <div class="container p-3">
+                                    <div class="media align-items-center mb-3">
+                                        <div class="media-img bg-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-peace-fill" viewBox="0 0 16 16">
+                                                <path d="M14 13.292A8 8 0 0 0 8.5.015v7.778l5.5 5.5zm-.708.708L8.5 9.206v6.778a7.967 7.967 0 0 0 4.792-1.986zM7.5 15.985V9.207L2.708 14A7.967 7.967 0 0 0 7.5 15.985zM2 13.292A8 8 0 0 1 7.5.015v7.778l-5.5 5.5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="mb-0"><b>Min/Max Quantities</b></p>
+                                            <p class="mb-0">Specify minimum and maximum allowed product quantities for orders to be completed</p>
+                                        </div>
+                                        <div class="media-more">
+                                            <button class="ml-2 btn btn-sm btn-outline-primary">Learn More</button>
+                                            <button class="ml-2 btn btn-sm btn-link">&times;</button>
+                                        </div>
+                                    </div>
+                                    <div class="media align-items-center mb-3">
+                                        <div class="media-img bg-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-award-fill" viewBox="0 0 16 16">
+                                                <path d="m8 0 1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z" />
+                                                <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z" />
+                                            </svg>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="mb-0"><b>Name Your Price</b></p>
+                                            <p class="mb-0">Let customers pay what they want - useful for donations, tips and more</p>
+                                        </div>
+                                        <div class="media-more">
+                                            <button class="ml-2 btn btn-sm btn-outline-primary">Learn More</button>
+                                            <button class="ml-2 btn btn-sm btn-link">&times;</button>
+                                        </div>
+                                    </div>
+                                    <div class="media align-items-center mb-3">
+                                        <div class="media-img bg-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-break-fill" viewBox="0 0 16 16">
+                                                <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V9H2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3zM2 12h12v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2zM.5 10a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H.5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="mb-0"><b>One Page Checkout</b></p>
+                                            <p class="mb-0">Don't make customers click around - let them choose products, checkout & pay all on one page</p>
+                                        </div>
+                                        <div class="media-more">
+                                            <button class="ml-2 btn btn-sm btn-outline-primary">Learn More</button>
+                                            <button class="ml-2 btn btn-sm btn-link">&times;</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                            <div id="custom" class="tab-pane fade">
+                                <div class="text-center p-3">
+                                    <div class="customProduct">
+
+                                    </div>
+
+                                    <button type="button" class="btn btn-info btn-sm" id="btnAddTab">Add a Tab</button>
+
+                                    @*<button type="button" class="ml-2 btn btn-info btn-sm" id="btnSaveTab">Add a Saved Tab</button>
+                                    <button type="button" class="btn btn-info btn-sm" id="btnsaveTab" style="display:none">Save Tabs</button>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div class="product indevidual-product" style="display:none;">
+    <div class="row divProduct">
+        <div class="col-12">
+            <div class="form-group divProductCategoryWrap">
+                <label for="txtProductCategory">Product Category</label>
+                <input type="text" class="form-control form-control-sm txtProductCategory">
+                <i id="spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw" style="float:right;margin-top:-24px;display:none;"></i>
+                <input type="hidden" class="hdnCategoryId" />
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group divProductNameWrap">
+                <label for="txtProductName">Product Name</label>
+                <input type="text" class="form-control form-control-sm txtProductName">
+                <i id="spiner" class="fa fa-spinner fa-pulse fa-2x fa-fw" style="float:right;margin-top:-24px;display:none;"></i>
+                <input type="hidden" class="hdnProductId" />
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12">
-            <button type="button" id="btnSave" class="btn btn-info">Sync with woocommerce</button>
+            <ul class="nav nav-tabs text-capitalize tablink border-0" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active tabSetting" data-id="basicset">Basic setting</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link tabSetting" data-id="advanceset">Advance setting</a>
+                </li>
+            </ul>
+            <div class="tab-content link-wrap">
+                <div class="tab-pane active tabContentSetting basicset">
+                    <div class="form-wrap p-3 border-bottom">
+                        <div class="row">
+                            <div class="divFilterVariations">
+                                <div class="form-group col-12">
+                                    <label>Filter Variations</label>
+                                    <label class="custom-checkbox mt_15">
+                                        <input type="checkbox" class="chkFilterVariations">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group col-12 divVariations" style="display:none; width:100%;">
+                                    <input type="text" class="form-control txtVariations" placeholder="Choose Variations...">
+                                    <input type="hidden" class="hdnVariation" />
+                                </div>
+                            </div>
+                            <div class="form-group col-12">
+                                <label>Override Default Selections</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkOverrideDefaultSelections">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="form-group col-12 divDefaultSelections" style="display:none;">
+                                <label></label>
+                                <select class="form-control form-control-sm mr-3 w_150 ddlDefaultMaterial">
+                                    <option>No Defaukt Material..</option>
+                                    <option>Latex</option>
+                                    <option>Silicone</option>
+
+                                </select>
+                                <select class="form-control form-control-sm w_150 ddlDefaultSize">
+                                    <option>No Defaukt Size</option>
+                                    <option>0.5L</option>
+                                    <option>1L</option>
+                                    <option>2L</option>
+                                    <option>3L</option>
+                                    <option>4L</option>
+                                    <option>5L</option>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label>Optional</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkOptional">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label>Min Quantity</label>
+                                <input type="number" class="form-control form-control-sm w_100 txtminquantity" value="1">
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label>Max Quantity</label>
+                                <input type="number" class="form-control form-control-sm w_100 txtmaxquantity" value="1">
+                            </div>
+                            <div class="form-group col-12">
+                                <label>Default  Quantity</label>
+                                <input type="number" class="form-control form-control-sm w_100 txtdefaultquantity" value="1">
+                            </div>
+                            <div class="form-group col-12">
+                                <label>Shipped Individually</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkShippedIndividually">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="form-group col-12">
+                                <label>Priced Individually</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkPricedIndividually">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="form-group col-12 divdiscount" style="display:none;">
+                                <label>Discount %</label>
+                                <input type="text" class="form-control form-control-sm w_100 txtDiscount" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane tabContentSetting advanceset">
+                    <div class="form-wrap p-3 border-bottom divbundlevisibility">
+                        <div class="form-group col-12">
+                            <label>Visibility</label>
+                        </div>
+                        <div class="form-group col-12 d-flex">
+                            <label class="custom-checkbox mt_15">
+                                <input type="checkbox" class="chkProductdetail" checked>
+                                Product details
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div class="form-group col-12 d-flex">
+                            <label class="custom-checkbox mt_15">
+                                <input type="checkbox" class="chkcartcheckout" checked>
+                                Cart/checkout
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div class="form-group col-12 d-flex">
+                            <label class="custom-checkbox mt_15">
+                                <input type="checkbox" class="chkorderdetail" checked>
+                                Order details
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div class="divadvancetitle">
+                            <div class="form-group col-12">
+                                <label>Override Title</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkOverrideTitle">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="form-group col-12 divoverridetitle" style="display:none;">
+                                <label></label>
+                                <textarea class="form-control txtoverridetitle" rows="2"></textarea>
+
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label>Override Short Description</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkOverrideShortDescription">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="form-group col-12 divOverrideShortDescription" style="display:none;">
+                                <label></label>
+                                <textarea class="form-control txtOverrideShortDescription" rows="2"></textarea>
+
+                            </div>
+
+                            <div class="form-group col-12">
+                                <label>Hide Thumbnail</label>
+                                <label class="custom-checkbox mt_15">
+                                    <input type="checkbox" class="chkHideThumbnail">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <button type="button" id="btnSubmit" class="btn btn-info">Submit</button>
+        @if (ViewBag.WcProductId != 0)
+        {
+            <button type="button" id="btnSync" class="btn btn-info">Sync To Woocommerce</button>
+        }
+    </div>
+</div>
+
+<div class="card row field individual-field" style="display:none">
+    <p class="tab-header">
+        <span class="txtLicense h5 font-weight-bold"></span>
+        <a class="deletevariant" href="javascript:void(0)">
+            <i class="fas fa-times" style="margin:0 0 7px 10px;color:red"></i>
+        </a>
+        <span id="downloableShow" class="downloableShow">
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+        </span>
+        <br />
+    </p>
+    <input type="hidden" class="hdnAttribiteId" />
+    <div class="tab-content">
+        <div class="container" id="container" style="display:none;">
+            <div class="row" style="margin:0 -4.5px">
+                <div class="col-sm-6">
+                    <input type="text" value="0" class="form-control form-control-sm txtdurationName" style="display:none">
+                    <div class="form-group">
+                        <label for="rPrice">Regular price ($)</label>
+                        <input type="number" value="0" class="form-control form-control-sm txtvariationsRegularPrice">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="sPrice">Sale price ($)</label>
+                        <input type="number" value="0" class="form-control form-control-sm txtvariationsalePrice">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Product Description</label>
+                <textarea class="form-control form-control-sm txtvariantsDescription" rows="5"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card p-3 fieldfile AddFile-Field" style="display:none">
+    <div class="align-items-end row">
+        <div class="col-sm-5">
+            <label>Name</label>
+            <input type="text" class="form-control form-control-sm txtfilename" placeholder="File Name" />
+        </div>
+        <div class="col-sm-5">
+            <label>File</label>
+            <input type="text" class="form-control form-control-sm txtfileurl" placeholder="File Link" />
+        </div>
+        <div class="col-sm-2 text-right">
+            <label></label>
+            <button type="button" class="btn btn-info btnAddFile">Add</button>
         </div>
     </div>
 </div>
 
+<div class="container customTab Custom-ProductSection" style="display:none;padding:10px 0" >
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row form-group align-items-center">
+                <label class="col-2 mb-0">Tab Title</label>
+                <div class="col-10">
+                    <input type="text" class="form-control txtTitle" />
+                </div>
+            </div>
+            @*<div class="d-flex justify-content-between mb-3">
+                <button class="btn btn-outline-primary"><i class="fa fa-camera"></i> Add Media</button>
+                <button class="btn btn-default">Visual</button>
+            </div>*@
+            <textarea class="form-control txtContent" rows="4"></textarea>
+        </div>
+        <div class="col-md-3 text-center">
+            @*<p>Move tab order</p>
+            <p>
+                <button class="btn"><i class="fa fa-2x fa-caret-up" aria-hidden="true"></i></button>
+                <button class="btn"><i class="fa fa-2x fa-caret-down" aria-hidden="true"></i></button>
+            </p>*@
+            <button type="button" class="btn btn-danger btn-block btnRemove"><i class="fa fa-times" aria-hidden="true"></i> Remove Tab</button>
+        </div>
+    </div>
+    <div class="custom-tab">
 
-<script src="~/js/CustomJs/productCreate.js"></script>
+    </div>
+</div>
+
+<script src="~/js/CustomJs/Woocommerce.js"></script>

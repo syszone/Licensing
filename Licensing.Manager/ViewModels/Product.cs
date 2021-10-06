@@ -27,6 +27,8 @@ namespace Licensing.Manager.ViewModels
         public string Features { get; set; }
         public int licenseType { get; set; }
         public string Durations { get; set; }
+
+        
     }
 
 

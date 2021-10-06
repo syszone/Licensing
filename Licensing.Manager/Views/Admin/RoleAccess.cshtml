@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Role Access";
+
+}
+<style>
+    i.jstree-icon.jstree-themeicon {
+        display: none;
+    }
+</style>
+
+<section style="padding:25px;">
+    <form>
+        <div class="col-12">
+            <div class="form-group col-md-4">
+                <label>Role</label>
+                <select id="ddlRoles" class="form-control">
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <div id="div-menu-item"></div>
+            </div>
+
+            <div class="form-group col-md-4">
+                <input type="button" value="Submit" id="btnRoleAccess" class="btn btn-sm btn-primary">
+            </div>
+        </div>
+    </form>
+</section>
+
+
+
+<script>
+    $(document).ready(function () {
+
+        GetRole();
+
+        $("#ddlRoles").change(function () {
+            GetMenuItem($(this).val());
+        });
+
+        $("#btnRoleAccess").click(function () {
+            $("#div-menu-item").jstree('open_all');
+            var treeData = [];
+
+            $("div#div-menu-item li").each(function () {
+                var data = new Object();
+                data.Id = $(this).attr("id");
+                var ulChildern = $(this).children("ul[class='jstree-children']");
+                if (ulChildern.length > 0) {
+                    data.Selected = $(ulChildern).children("li").children("a").hasClass("jstree-clicked");
+
+                } else {
+                    data.Selected = $(this).children("a").hasClass("jstree-clicked") ? true : false;
+                }
+                treeData.push(data);
+            });
+
+            var model = {
+                RoleId: $("#ddlRoles").val(),
+                RolesItem: treeData
+            }
+            $.ajax({
+                url: "/Admin/CreateRoleAccess",
+                method: "POST",
+                dataType: "json",
+                data: model,
+                success: function (result) {
+                    if (result) {
+                        toastr.success("Role Has Been Saved");
+                    }
+                    else {
+                        toastr.error("Please contact administration!");
+                    }
+                }
+            });
+        });
+
+    });
+
+    function GetRole() {
+        $.ajax({
+            url: "/Admin/GetRole",
+            method: "GET",
+            dataType: "json",
+            success: function (result) {
+                $("#ddlRoles").append($("<option></option>").val("0").html("Select Role"));
+                $.each(result, function (data, value) {
+                    $("#ddlRoles").append($("<option></option>").val(value.roleId).html(value.name));
+                })
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    function GetMenuItem(RoleId) {
+
+        $.ajax({
+            url: "/Admin/GetMenuItem?roleId=" + RoleId,
+            method: "GET",
+            dataType: "json",
+            success: function (result) {
+                var nodes = JSON.parse(result);
+                $("#div-menu-item").jstree("destroy");
+                $('#div-menu-item').jstree({
+                    'plugins': ["wholerow", "checkbox"],
+                    'core': {
+                        'data': nodes
+                    },
+                    "checkbox": {
+                        "keep_selected_style": false
+                    }
+                });
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+
+
+</script>

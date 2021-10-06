@@ -1,0 +1,62 @@
+﻿@model ApplicationUser
+
+@{
+    ViewData["Title"] = "Change Avtar";
+    var Image = Model.Image ?? "/images/icon-5359553_1280.png";
+
+}
+
+<section style="padding:25px;">
+    <div id="userImage">
+        <img src="@Image" />
+    </div>
+    <section style="padding-top:20px;">
+        <form>
+            <input type="hidden" id="hdnUserId" value="@Model.Id" />
+            <div class="col-12">
+                <div class="form-group col-md-4">
+                    <label>Change Avatar</label>
+                    <input type="file" id="userAvatar" accept=".png,.jpeg,.jpg">
+                </div>
+                <div class="form-group col-md-4">
+                    <input type="button" value="Submit" id="btnChangeAvatar" class="btn btn-primary">
+                </div>
+            </div>
+
+        </form>
+    </section>
+</section>
+
+
+
+<script>
+
+    $("#btnChangeAvatar").click(function () {
+        var UserDetails = new FormData();
+        UserDetails.append("UserId", $("#hdnUserId").val());
+
+        var file = document.getElementById('userAvatar');
+        UserDetails.append("Image", file.files[0]);
+
+        $.ajax({
+            url: "/Admin/ChangeAvatar",
+            type: "POST",
+            data: UserDetails,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                if (res.isSuccess) {
+                    toastr.success("User Avtar Changed!");
+                }
+                else {
+                    toastr.error("Please contact administration!");
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+
+    });
+
+</script>

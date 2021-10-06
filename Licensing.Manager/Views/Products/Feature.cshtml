@@ -2,51 +2,39 @@
 @{
     ViewData["Title"] = "Product Feature";
 }
+ 
 
 <div class="">
     <div class="form-group">
-        <div class="col-6">
-            <label>Name</label>
-            <input type="text" class="form-control" id="txtName" />
-            <input type="hidden" id="hdnFeatureId" value="0" />
-        </div>
-        <div class="col-6">
-            <label>Value</label>
-            <input type="text" class="form-control" id="txtValue" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <button type="button" id="btnSaveFeature" class="btn btn-info ml-1">Save Feature</button>
+        <div class="row">
+            <div class="col-4">
+                <label>Name</label>
+                <input type="text" class="form-control" id="txtName" />
+                <input type="hidden" id="hdnFeatureId" value="0" />
+            </div>
+            <div class="col-4">
+                <label>Value</label>
+                <input type="text" class="form-control" id="txtValue" />
+            </div>
+            <div class="col-4">
+                <button type="button" id="btnSaveFeature" class="btn btn-info ml-1" style="margin-top:30px;">Save Feature</button>
+            </div>
         </div>
     </div>
 </div>
-<table class="table">
-    <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Action</th>
-    </tr>
+<div class="card-body">
+    <table id="tblFeatures" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                
+                <th>Name</th>
+                <th>Value</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Value)
-            </td>
-            <td>
 
-                <button type="button" class="btn btn-sm btn-success" onclick="EditRole('@item.Id', '@item.Name','@item.Value')">Edit</button>
-                <button type="button" class="btn btn-sm btn-danger" onclick="DeleteRole('@item.Id')">Delete</button>
-
-            </td>
-        </tr>
-    }
-
-</table>
-
+ 
 <script src="~/js/CustomJs/productfeature.js"></script>

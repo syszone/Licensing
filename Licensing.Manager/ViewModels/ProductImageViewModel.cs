@@ -18,5 +18,6 @@ namespace Licensing.Manager.ViewModels
 
         public DateTime OrderCreatedDate { get; set; }
 
+        public int WCOrderId { get; set; }
     }
 }

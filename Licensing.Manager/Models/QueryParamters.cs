@@ -1,4 +1,5 @@
-﻿using Licensing.Manager.ViewModels.WoocommerceModels;
+﻿using Licensing.Manager.Models;
+using Licensing.Manager.ViewModels.WoocommerceModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,5 +98,14 @@ namespace Licensing.Manager.Model
     {
         public int Id { get; set; }
         public  int WCProductId  { get;set;}
+    }
+    public class CreateRoleAccessQueryParameters
+    {
+        public string RoleId { get; set; }
+        public List<RoleItem> RolesItem { get; set; }
+    }
+    public class RoleIdQueryParameters
+    {
+        public string RoleId { get; set; }
     }
 }

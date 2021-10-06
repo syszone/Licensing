@@ -1,4 +1,6 @@
-﻿var count = 0;
+﻿ 
+
+var count = 0;
 var DurationList = [];
 var LicenseName = "";
 var VariationList = [];
@@ -37,7 +39,7 @@ $(function () {
 
 
     $('input[type=radio][name=imageOption]').change(function () {
-        debugger;
+
         if ($("input:radio[name='imageOption']:checked").val() == 'AddLink') {
             $("#divchoosefiles").hide();
             $(".AddFiles").show();
@@ -60,13 +62,12 @@ $(function () {
 
 
 $(document).on("click", "#btnSubmit", function () {
-    debugger;
+  
     var categoryList = [];
-
     $("#jstreeAllCategory").jstree('open_all');
     $("#jstreeAllCategory li").each(function () {
         var data = {};
-        data.id = $(this).attr("id");
+        data.id = $(this).attr("id").replace("j1_", "");
         data.name = $(this).text().trim();
 
         var ulChildern = $(this).children("ul[class='jstree-children']");
@@ -112,7 +113,6 @@ $(document).on("click", "#btnSubmit", function () {
                 ProductDetails.append("Image-" + i, fileInput.files[i]);
 
             }
-
         }
         if ($('input[type=radio][name=imageOption]:checked').val() == 'AddLink') {
             var FilesList = [];
@@ -134,9 +134,24 @@ $(document).on("click", "#btnSubmit", function () {
         productData.download_expiry = "0";
     }
 
-    //ProductDetails.append("Product", JSON.stringify(FilesList));
-    ProductDetails.append("Product", JSON.stringify(productData));
+    //Add Meta_deta
+    var ProductMeta = {};
+    ProductMeta.key = "yikes_woo_products_tabs";
+    ProductMeta.value = [];
+    $(".customProduct .Custom-ProductSection").each(function (index, prodctTab) {
+        
+        var values = {
+            title: $(prodctTab).find(".txtTitle").val(),
+            id: $(prodctTab).find(".txtTitle").val(),
+            content: "<p>"+$(prodctTab).find(".txtContent").val() +"</p>"
 
+        }
+        ProductMeta.value.push(values);
+    });
+    productData.meta_data = [];
+    productData.meta_data.push(ProductMeta);
+
+    ProductDetails.append("Product", JSON.stringify(productData));
     var durationDetails = new FormData();
 
     durationDetails.licensetype = $("#drpLicenseType").val();
@@ -172,7 +187,6 @@ $(document).on("click", "#btnSubmit", function () {
     });
 
 
-
     ProductDetails.append("ProductVariation", JSON.stringify(VariantList));
 
     $.ajax({
@@ -182,9 +196,11 @@ $(document).on("click", "#btnSubmit", function () {
         processData: false,
         contentType: false,
         success: function (res) {
-
             if (res.isSuccess == true) {
+                
+                var ProductId = res.response;
                 toastr.success('Product  Successfully Created');
+                location.href = "/Products/Create?productId=" + ProductId + "&WCProductId=" + $("#hdnWcProductId").val();
             }
             else {
                 toastr.warning('Something Is Wrong Plesae Try Again!', { stayTime: 60000, });
@@ -248,7 +264,6 @@ function BindProductLicenseTypeDrodown() {
             $.each(res, function (data, value) {
                 $("#drpLicenseType").append($("<option></option>").val(value.id).html(value.type));
             })
-
         },
         error: function (err) {
             console.log(err);
@@ -264,23 +279,24 @@ $(document).on("change", "#drpLicenseType", function () {
     if (Id == 1) {
         $("#divTrialDuration").show();
         $("#divStandard").hide();
+        $(".Variations .individual-field").remove();
         BindTrialDuration();
     }
     else if (Id == 3) {
         $("#divStandard").show();
         $("#divTrialDuration").hide();
+        $(".Variations .individual-field").remove();
         BindDuration();
     }
     else {
         $("#divStandard").hide();
-        $("#divTrial").hide();
+        $("#divTrialDuration").hide();
     }
 
 });
 
 function BindDuration() {
     $("#ddlDuration").select2({ placeholder: "Select Duration" });
-    //debugger;
     var licenseId = $('#drpLicenseType').val();
     $.ajax({
         url: '/Products/GetLicenseTypeDuration?licenseId=' + licenseId,
@@ -296,14 +312,12 @@ function BindDuration() {
                 })
                 $("#ddlDuration").append($("<option></option>").val(value.id).html(value.duration));
             })
-
         }
     })
 }
 
 
 function BindTrialDuration() {
-    debugger;
     var licenseId = $('#drpLicenseType').val();
     $.ajax({
         url: '/Products/GetLicenseTypeDuration?licenseId=' + licenseId,
@@ -320,14 +334,14 @@ function BindTrialDuration() {
                 })
                 $("#ddlTrialDuration").append($("<option></option>").val(value.id).html(value.duration));
             })
-
         }
     });
 }
 
 
 $(document).on("change", "#ddlTrialDuration", function () {
-    debugger;
+     
+    $(".Variations .individual-field").remove();
     var Durations = $(this).val();
     $("#ddlVariationsDuration").empty();
     var name = DurationList.filter(r => r.id == Durations)[0];
@@ -335,14 +349,14 @@ $(document).on("change", "#ddlTrialDuration", function () {
 });
 
 $(document).on("change", "#ddlDuration", function () {
-
+    
+    $(".Variations .individual-field").remove();
     var Durations = $(this).val();
     $("#ddlVariationsDuration").empty();
     for (var i = 0; i < Durations.length; i++) {
         var name = DurationList.filter(r => r.id == Durations[i])[0];
         $("#ddlVariationsDuration").append("<option value='" + Durations[i] + "'>" + name.name + "</option>");
     }
-
 });
 
 function showLoader() {
@@ -354,6 +368,7 @@ function hideLoader() {
 }
 
 $(document).on("click", "#btnAddvariations", function () {
+    debugger;
     var varList = VariationList.filter(el => $('#ddlVariationsDuration').val().includes(el));
     if (varList.length == 0) {
         appendDiv();
@@ -363,9 +378,7 @@ $(document).on("click", "#btnAddvariations", function () {
 function appendDiv() {
     count++;
     $(".field").clone().appendTo(".Variations");
-    //$(".field p")[1].style.display = 'none';
     $(".Variations .field").show();
-    //$(".Variations .field").find(".downloadableVariationsDiv").attr("id", "variations-" + count); 
     $(".Variations .field").find("#downloadableChk").attr("class", "downloadable-" + count);
     $(".Variations .field").find("#container").attr("class", "p-3 downloadable-" + count);
     $(".Variations .field").find("#downloableShow").attr("id", "downloadable-" + count);
@@ -385,6 +398,7 @@ $(document).on("click", ".btnAddFile", function () {
 });
 
 $(document).on("click", ".downloableShow", function () {
+    debugger;
     if ($(this).find('i').hasClass('fa-angle-double-down')) {
         $(this).find('i').removeClass('fa-angle-double-down').addClass('fa-angle-double-right');
         var cls = '.' + $(this).attr("id");
@@ -412,7 +426,6 @@ function BindFeatures() {
             $.each(res, function (data, value) {
                 $("#ddlFeatures").append($("<option></option>").val(value.id).html(value.name));
             })
-
         }
     })
 }
@@ -420,7 +433,7 @@ function BindFeatures() {
 
 function BindData() {
     var productId = $("#hdnProductId").val();
-
+  
     $.ajax({
         url: '/Products/GetProductData?ProductId=' + productId,
         type: "GET",
@@ -433,13 +446,12 @@ function BindData() {
             $("#txtrRegularPrice").val(res.product.regular_price);
             $("#txtsalePrice").val(res.product.sale_price);
             $("#txtsku").val(res.product.sku);
-         
+
             if (res.product.downloadable == true) {
                 $("#chkDownloadable").prop("checked", true).trigger("change");
                 var variants = [];
                 if (res.varients.length > 0) {
                     variants.push(res.varients[0])
-
                 }
                 for (var i = 0; i < variants.length; i++) {
                     var downloads = res.varients[i].downloads;
@@ -454,16 +466,10 @@ function BindData() {
 
                 $(".AddFiles .AddFile-Field:last").find("#txtDownloadLimit").val(variants[0].download_limit);
                 $(".AddFiles .AddFile-Field:last").find("#txtdownloadExpiry").val(variants[0].download_expiry);
-               
-
-
-
             }
             else {
                 $("#chkDownloadable").prop("checked", false).trigger("change");
             }
-
-
 
             var featureList = res.features.split(",");
             $("#ddlFeatures").val(featureList);
@@ -476,7 +482,7 @@ function BindData() {
                 $(document).find("#" + val.id + " a").trigger("click");
             }
             $("#drpLicenseType").val(res.licenseType).trigger("change");
-
+             
             setTimeout(function () {
                 if (res.licenseType == 3) {
                     var durationsList = res.durations.split(",");
@@ -489,11 +495,10 @@ function BindData() {
                 else if (res.licenseType == 1) {
                     $("#ddlTrialDuration").val(res.durations).trigger("change");
                 }
-                
+
                 for (var i = 0; i < res.varients.length; i++) {
                     var attribute = res.varients[i].attributes[0];
                     $("#ddlVariationsDuration option").each(function (i, option) {
-
                         if (option.label == attribute.option) {
                             option.selected = "selected";
                         }
@@ -503,10 +508,22 @@ function BindData() {
                     $(".Variations .individual-field:last").find(".txtvariationsalePrice").val(res.varients[i].sale_price);
                     $(".Variations .individual-field:last").find(".txtvariantsDescription").val(res.varients[i].description);
                 }
+               
 
             }, 3000);
+          
+            var Tabs = res.product.meta_data.filter(r => r.key == "yikes_woo_products_tabs");
+            if (Tabs != null && Tabs.length > 0) {
+                var valueList = Tabs[0].value;
+                for (var j = 0; j < valueList.length; j++) {
 
+                    $("#btnAddTab").trigger("click");
+                    $(".customProduct .Custom-ProductSection:last").find(".txtTitle").val(valueList[j].title);
+                    $(".customProduct .Custom-ProductSection:last").find(".txtContent").val(valueList[j].content.replace("<p>", "").replace("</p>", ""));
 
+                }
+
+            }
         }
     });
 }
@@ -524,16 +541,29 @@ $(document).on("click", "#btnSync", function () {
             }
             else {
                 toastr.warning('Something Is Wrong Plesae Try Again!');
-            } 
+            }
         },
         error: function (err) {
             console.log(err);
         }
     });
-
 });
 
 
 $(document).on("click", ".deletevariant", function () {
     $(this).parent().parent().remove();
+});
+
+function appendTabDiv() {
+    $(".customTab").clone().appendTo(".customProduct");
+    $(".customProduct .customTab").show();
+    $(".customProduct .customTab").removeClass("customTab");
+}
+
+$(document).on("click", "#btnAddTab", function () {
+    appendTabDiv();
+});
+
+$(document).on("click",".btnRemove", function () {
+    $(this).parent().parent().parent().remove();
 });

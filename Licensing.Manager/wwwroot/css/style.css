@@ -470,7 +470,10 @@ ul.ui-autocomplete {
     position: relative;
     pointer-events: auto;
     overflow: hidden;
-    margin:0 0 520px;
+    right:0;
+    bottom:0;
+     z-index:999999;
+    /*margin:0 0 520px;*/
     width: 300px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -491,4 +494,29 @@ ul.ui-autocomplete {
 }
 [class*=sidebar-dark-] .nav-treeview > .nav-item > .nav-link {
     width: calc(230px - .5rem * 2);
+}
+#userImage {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid;
+}
+
+    #userImage img {
+        height: 100%;
+        max-width: 100%;
+    }
+
+.user-profile {
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid;
+    height: 100px;
+    width: 100px;
+    margin: 0 auto;
+}
+
+.user-id {
+    text-align: center;
 }

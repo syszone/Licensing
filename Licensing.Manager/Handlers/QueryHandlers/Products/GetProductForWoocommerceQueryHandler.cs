@@ -41,7 +41,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
 
                     ProductViewModel Products = new ProductViewModel();
                     List<ProductVarientViewModel> varientList = new List<ProductVarientViewModel>();
-                   
+
                     if (result != null && result.Count() > 0)
                     {
                         Products = result.Select(x => new ProductViewModel
@@ -186,7 +186,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Products
                                 {
 
                                     title = item.Name,
-                                    id = item.Name,
+                                    id = item.Name.Replace(" ", "-"),
                                     content = item.Contents
                                 };
                                 tabs.value.Add(tab);

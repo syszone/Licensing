@@ -142,7 +142,6 @@ $(document).on("click", "#btnSubmit", function () {
         
         var values = {
             title: $(prodctTab).find(".txtTitle").val(),
-            id: $(prodctTab).find(".txtTitle").val(),
             content: "<p>"+$(prodctTab).find(".txtContent").val() +"</p>"
 
         }
@@ -275,22 +274,23 @@ $(document).on("change", "#drpLicenseType", function () {
 
     var Id = $(this).val();
     LicenseName = $("#drpLicenseType option:selected").text();
-
+    $(".Variations .individual-field").remove();
     if (Id == 1) {
         $("#divTrialDuration").show();
         $("#divStandard").hide();
-        $(".Variations .individual-field").remove();
+       // $(".Variations .individual-field").remove();
         BindTrialDuration();
     }
     else if (Id == 3) {
         $("#divStandard").show();
         $("#divTrialDuration").hide();
-        $(".Variations .individual-field").remove();
+       //$(".Variations .individual-field").remove();
         BindDuration();
     }
     else {
         $("#divStandard").hide();
         $("#divTrialDuration").hide();
+        //$(".Variations .individual-field").remove();
     }
 
 });
@@ -341,7 +341,7 @@ function BindTrialDuration() {
 
 $(document).on("change", "#ddlTrialDuration", function () {
      
-    $(".Variations .individual-field").remove();
+    
     var Durations = $(this).val();
     $("#ddlVariationsDuration").empty();
     var name = DurationList.filter(r => r.id == Durations)[0];
@@ -350,7 +350,7 @@ $(document).on("change", "#ddlTrialDuration", function () {
 
 $(document).on("change", "#ddlDuration", function () {
     
-    $(".Variations .individual-field").remove();
+    
     var Durations = $(this).val();
     $("#ddlVariationsDuration").empty();
     for (var i = 0; i < Durations.length; i++) {
@@ -439,7 +439,7 @@ function BindData() {
         type: "GET",
         dataType: "json",
         success: function (res) {
-            console.log(JSON.stringify(res))
+           
             $("#productName").val(res.product.name);
             $("#txtproductDescription").val(res.product.description);
             $("#txtproductshortDescription").val(res.product.short_description);

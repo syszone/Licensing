@@ -28,7 +28,7 @@ namespace Licensing.Manager.General
                 var user = await _usermanager.FindByIdAsync(userId);
                 if (user != null && user.IsActive == true)
                 {
-                    var listMenu = await HomeController.GetMenuItem();
+                    var listMenu = await HomeController.GetMenuItem(userId);
                     var menu = listMenu.Where(r => r.URL == context.HttpContext.Request.Path.Value).FirstOrDefault();
                     if (menu != null && menu.HasAccess == true)
                     {

@@ -1,10 +1,13 @@
 ﻿@using Licensing.Manager.General;
 @using Licensing.Manager.Controllers;
+@using System.Security.Claims;
 
 @{
+    var claims = ViewContext.HttpContext.User.Claims.ToList();
+    var userId = claims.Where(r => r.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
     var controller = ViewContext.RouteData.Values["Controller"].ToString();
     var method = ViewContext.RouteData.Values["Action"].ToString();
-    var MenuList = await HomeController.GetMenuItem();
+    var MenuList = await HomeController.GetMenuItem(userId);
  }
 
 

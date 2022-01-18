@@ -11,6 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Licensing.Validation;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Net.Http.Headers;
 
 namespace Licensing.Manager.Controllers
 {
@@ -42,20 +45,30 @@ namespace Licensing.Manager.Controllers
                 for (int i = 0; i < Request.Form.Files.Count; i++)
                 {
                     var file = Request.Form.Files[i];
-                    var result = new StringBuilder();
-                    using (var reader = new StreamReader(file.OpenReadStream()))
+                    string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var fileExt = System.IO.Path.GetExtension(filename).Substring(1);
+                    if (fileExt.ToLower() == "lic")
                     {
-                        while (reader.Peek() >= 0)
-                            result.AppendLine(await reader.ReadLineAsync());
-                    }
+                        var result = new StringBuilder();
+                        using (var reader = new StreamReader(file.OpenReadStream()))
+                        {
+                            while (reader.Peek() >= 0)
+                                result.AppendLine(await reader.ReadLineAsync());
+                        }
 
-                    XmlSerializer serializer = new XmlSerializer(typeof(License));
-                    using (StringReader reader = new StringReader(result.ToString()))
-                    {
-                        KeyObject.license = License.Load(result.ToString());
+                        XmlSerializer serializer = new XmlSerializer(typeof(License));
+                        using (StringReader reader = new StringReader(result.ToString()))
+                        {
+                            KeyObject.license = License.Load(result.ToString());
+                        }
+                        var data = KeyObject;
+                        response = await _mediator.Send(new VerifyLicenseQuery(KeyObject));
                     }
-                    var data = KeyObject;
-                    response = await _mediator.Send(new VerifyLicenseQuery(KeyObject));
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Invalid FileType";
+                    }
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,14 @@
+<License>
+  <Id>68ba4bb4-6858-4e7f-8839-5c68d9d515f8</Id>
+  <Type>Subscription</Type>
+  <Quantity>1</Quantity>
+  <ProductFeatures>
+    <Feature name="Feature 2">True</Feature>
+    <Feature name="Feature 4">True</Feature>
+  </ProductFeatures>
+  <Customer>
+    <Name>Rupal Ribadiya</Name>
+    <Email>rupalribadiya.vision@gmail.com</Email>
+  </Customer>
+  <Signature>MEYCIQD6UG5fcL4dtYLRxwFNxJcUu5vggA/BtPJKYAIhK57PyQIhAKNNhHGZW3m9FaAYFYzk2Tvl9qGB+05T3kRTyPXelLJs</Signature>
+</License>

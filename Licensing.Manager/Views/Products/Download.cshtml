@@ -49,9 +49,11 @@
                         {
                             "render": function (data, type, row, full) {
                                 var id = "dropdownMenuButton" + row.wcOrderId;
-                                return "<div class='dropdown'><button class='btn btn-secondary dropdown-toggle' type='button' id='" + id + "' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Download </button><div class='dropdown-menu' aria-labelledby='" + id + "'><li><a class='dropdown-item' href='javascript:void(0)' onclick=DownloadFile('" + row.id + "');>Product Downloadable Files</a></li><li><a class='dropdown-item' target='_blank' href='" + row.licenseURL+"'>License Files</a></li></div>"
+                               
+                                return "<div class='dropdown'><button class='btn btn-secondary dropdown-toggle' type='button' id='" + id + "' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Download </button><div class='dropdown-menu' aria-labelledby='" + id + "'><li><a class='dropdown-item' href='/Products/DownloadFiles?productId=" + row.id+"'>Product Downloadable Files</a></li><li><a class='dropdown-item' href='/Products/DownloadLicenseZip?LicenseUrl=" + row.licenseURL + "&OrderId=" + row.wcOrderId +"' download>License Files</a></li></div>"
                                 
                             }
+                                
                         },
                     ]
                 });
@@ -59,17 +61,5 @@
         });
     }
 
-    function DownloadFile(ProductId) {
-
-        $.ajax({
-            url: "/Products/DownloadFiles?productId=" + ProductId,
-            method: "GET",
-            dataType: "text",
-            success: function (result) {
-                location.href = "/Products/DownloadZip?folder=" + result;
-            }
-        });
-    }
-    
 </script>
 

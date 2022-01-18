@@ -57,14 +57,19 @@ namespace Licensing.Manager.Controllers
                         duration = await _mediator.Send(new GetLicenseTypeDurationQuery(LicenseDuration[0].display_key, LicenseDuration[0].display_value));
                     }
 
+                    var productId = request.line_items.FirstOrDefault().product_id;
+                    Woocommerce wc = new Woocommerce(_configuration);
+                    var product = await wc.GetProducts(productId);
+
                     CustomerViewModel _customer = new CustomerViewModel
                     {
                         WCOrderId = request.id,
-                        WCProductId = request.line_items.FirstOrDefault().product_id,
+                        WCProductId = productId,
                         Name = request.billing.first_name + " " + request.billing.last_name,
                         Company = request.billing.company,
                         Email = request.billing.email,
-                        LicenseDurationId = duration.Count > 0 ? duration[0].Id : 0
+                        LicenseDurationId = duration.Count > 0 ? duration[0].Id : 0,
+                        productLink = product.permalink
                     };
                     var data = await _mediator.Send(new InsertCustomerQuery(_customer));
                     if (data != null && !string.IsNullOrEmpty(_customer.Email))
@@ -84,7 +89,7 @@ namespace Licensing.Manager.Controllers
                             Directory.CreateDirectory(keyPath);
                         }
 
-                        var fileName = DateTime.Now.Ticks + ".txt";
+                        var fileName = DateTime.Now.Ticks + ".lic";
                         keyPath = Path.Combine(keyPath, fileName);
 
                         fileURL = fileURL + "/Key/" + fileName;
@@ -111,8 +116,10 @@ namespace Licensing.Manager.Controllers
                         };
 
                         var res = await _mediator.Send(new InsertLicenseQuery(model));
-                        //Send Keypath to email
-                        await _emailSender.SendEmailAsync(_customer.Email, "License Key", $"Please find your licence key in the attachment.",
+                        var Link = _configuration.GetSection("Link").GetSection("link").Value;
+                        //Send Keypath to email<a href='" + response.Source + "' target='_blank'>Go to here <i class='fas fa-sign-out-alt'></i></a>
+                        var link = "You can register by using this <a href='"+ Link + request.id + "'>link</a>";
+                        await _emailSender.SendEmailAsync(_customer.Email, "License Key", $"Please find your licence key in the attachment." + link,
                          keyPath);
                     }
                 }

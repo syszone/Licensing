@@ -33,14 +33,23 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
             try
             {
                 var connection = new SqlConnection(Utils.GetConnectionString());
-                var result = await connection.QueryAsync("GetLicense", new 
-                { 
-                    LicenseId = req.license.Id 
+                var result = await connection.QueryAsync("GetLicense", new
+                {
+                    LicenseId = req.license.Id
                 }, commandType: CommandType.StoredProcedure);
 
                 if (result != null && result.Count() > 0)
                 {
-                    response = result.Select(x => new VerifyResponseModel { ExpiryDate = x.ExpiryDate }).FirstOrDefault();
+                    response = result.Select(x => new VerifyResponseModel { 
+                        ExpiryDate = x.ExpiryDate, 
+                        RegisterdDate = x.RegisteredDate, 
+                        OrderDate = x.OrderCreated,
+                        OrderId = x.WCOrderId,
+                        LicenseType = x.Type,
+                        LicenseTypeDuration = x.Duration,
+                        ProductLink = x.ProductLink
+                    }).FirstOrDefault();
+
                     publicKey = result.Select(x => x.PublicKey).FirstOrDefault();
                     DurationEnum = result.Select(x => x.DurationEnum).FirstOrDefault();
                 }
@@ -55,11 +64,11 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                 {
                     await connection.OpenAsync();
 
-                    result = await connection.QueryAsync("VerifyMachineKey", new 
-                    { 
-                        LicenseId = req.license.Id, 
-                        Email = req.Email, 
-                        MachineKey = req.MachineKey 
+                    result = await connection.QueryAsync("VerifyMachineKey", new
+                    {
+                        LicenseId = req.license.Id,
+                        Email = req.Email,
+                        MachineKey = req.MachineKey
                     }, commandType: CommandType.StoredProcedure);
 
                     if (result != null && result.Count() > 0)
@@ -89,6 +98,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                                 MachineKey = req.MachineKey
                             }, commandType: CommandType.StoredProcedure);
 
+                            response.RegisterdDate = DateTime.Now;
                             if (response.ExpiryDate > DateTime.Now)
                             {
                                 response.IsSuccess = true;
@@ -133,7 +143,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                             {
                                 LicenseId = req.license.Id
                             }, commandType: CommandType.StoredProcedure);
-                            
+
                             rowCount = res.Select(x => x.count).FirstOrDefault();
                             if (rowCount < req.license.Quantity)
                             {
@@ -145,6 +155,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                                     MachineKey = req.MachineKey
                                 }, commandType: CommandType.StoredProcedure);
 
+                                response.RegisterdDate = DateTime.Now;
                                 response.IsSuccess = true;
                                 response.Message = "Success";
                                 response.Features = await GetProductFeartre(req.license.Id.ToString());
@@ -244,7 +255,7 @@ namespace Licensing.Manager.Handlers.QueryHandlers.Verification
                 .AssertValidLicense()
                 .ToList();
 
-            if(validationResults.Count == 0)
+            if (validationResults.Count == 0)
             {
                 return true;
             }

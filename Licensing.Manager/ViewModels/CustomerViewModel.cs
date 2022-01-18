@@ -9,6 +9,7 @@ namespace Licensing.Manager.ViewModels
         public string Name { get; set; }
         public string Company { get; set; }
         public string Email { get; set; }
+        public string productLink { get; set; }
         public int LicenseDurationId { get; set; }
     }
 

@@ -24,16 +24,19 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
+             RoleManager<IdentityRole> roleManager,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _roleManager = roleManager;
             _emailSender = emailSender;
         }
 
@@ -99,6 +102,14 @@ namespace Licensing.Manager.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    var roleName = "Guest";
+                    var roleExist = await _roleManager.RoleExistsAsync(roleName);
+                    if (!roleExist)
+                    {
+                        var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+                    }
+                    var assignResult = await _userManager.AddToRoleAsync(user, roleName);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

@@ -141,7 +141,7 @@ $(document).on("click", "#btnSubmit", function () {
     $(".customProduct .Custom-ProductSection").each(function (index, prodctTab) {
         
         var values = {
-            title: $(prodctTab).find(".txtTitle").val(),
+            title: $(prodctTab).find(".txtTitle").val().trim(),
             content: "<p>"+$(prodctTab).find(".txtContent").val() +"</p>"
 
         }
@@ -551,7 +551,9 @@ $(document).on("click", "#btnSync", function () {
 
 
 $(document).on("click", ".deletevariant", function () {
-    $(this).parent().parent().remove();
+    debugger;
+    //$(this).parent().parent().remove();
+    $(this).parents().eq(1).remove();
 });
 
 function appendTabDiv() {
@@ -564,6 +566,8 @@ $(document).on("click", "#btnAddTab", function () {
     appendTabDiv();
 });
 
-$(document).on("click",".btnRemove", function () {
-    $(this).parent().parent().parent().remove();
+$(document).on("click", ".btnRemove", function () {
+    debugger;
+    //$(this).parent().parent().parent().remove();
+    $(this).parents().eq(2).remove();
 });

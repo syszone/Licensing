@@ -33,7 +33,7 @@ namespace Licensing.Manager.API.Handlers.QueryHandlers.WooCommerce
                     await connection.OpenAsync();
 
                     IEnumerable<dynamic> result = await connection.QueryAsync("InsertCustomerInfo",
-                       new { WCOrderId = req.WCOrderId, WCProductId = req.WCProductId, Name = req.Name, Company = req.Company, Email = req.Email, LicenseDurationId = req.LicenseDurationId },
+                       new { WCOrderId = req.WCOrderId, WCProductId = req.WCProductId, Name = req.Name, Company = req.Company, Email = req.Email, LicenseDurationId = req.LicenseDurationId, ProductLink = req.productLink },
                          commandType: CommandType.StoredProcedure);
 
                     var list = new List<CustomerResponseViewModel>();

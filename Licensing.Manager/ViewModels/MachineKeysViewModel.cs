@@ -16,8 +16,15 @@ namespace Licensing.Manager.ViewModels
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
+        public DateTime? RegisterdDate { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public List<string> Features { get; set; }
+        public int OrderId { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string LicenseType { get; set; }
+        public string LicenseTypeDuration { get; set; }
+        public string ProductLink { get; set; }
+
     }
 
 }
